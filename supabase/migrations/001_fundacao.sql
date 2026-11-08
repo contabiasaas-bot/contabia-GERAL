@@ -1,85 +1,84 @@
--- Documentos enviados
-create table documents (
+-- Habilitar extensão de UUID
+create extension if not exists "uuid-ossp";
+
+-- Enums de papéis e status
+create type user_role as enum ('super_admin', 'office_admin', 'accountant', 'client');
+create type subscription_status as enum ('active', 'trialing', 'past_due', 'canceled', 'blocked');
+
+-- Escritórios de Contabilidade (Tenants)
+create table offices (
     id uuid primary key default uuid_generate_v4(),
-    client_id uuid references clients(id) on delete cascade not null,
-    file_name text not null,
-    file_path text not null,
-    file_type varchar(50) not null,
-    file_size int not null,
-    file_hash varchar(64) not null,
-    status varchar(30) not null default 'pending',
-    created_by uuid references profiles(id),
+    corporate_name text not null,
+    trade_name text,
+    cnpj varchar(14) unique not null,
+    plan_id uuid,
+    status subscription_status default 'trialing',
+    created_at timestamptz default now(),
+    updated_at timestamptz default now(),
+    deleted_at timestamptz
+);
+
+-- Planos do SaaS
+create table plans (
+    id uuid primary key default uuid_generate_v4(),
+    name text not null,
+    max_clients int not null,
+    price_cents int not null,
     created_at timestamptz default now()
 );
 
--- Transações do Extrato Bancário
-create table bank_statements (
-    id uuid primary key default uuid_generate_v4(),
-    client_id uuid references clients(id) on delete cascade not null,
-    document_id uuid references documents(id) on delete set null,
-    transaction_date date not null,
-    description text not null,
-    amount_cents bigint not null,
-    balance_cents bigint,
-    reconciled boolean default false,
-    created_at timestamptz default now()
+-- Perfis dos Usuários
+create table profiles (
+    id uuid primary key references auth.users(id) on delete cascade,
+    office_id uuid references offices(id) on delete cascade,
+    role user_role not null default 'accountant',
+    full_name text not null,
+    email text unique not null,
+    blocked boolean default false,
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
 );
 
--- Notas Fiscais
-create table invoices (
-    id uuid primary key default uuid_generate_v4(),
-    client_id uuid references clients(id) on delete cascade not null,
-    document_id uuid references documents(id) on delete set null,
-    invoice_number varchar(50) not null,
-    issue_date date not null,
-    invoice_type varchar(20) not null,
-    counterpart_name text not null,
-    counterpart_cnpj varchar(14),
-    total_amount_cents bigint not null,
-    tax_amount_cents bigint default 0,
-    created_at timestamptz default now()
-);
+-- Habilitar RLS
+alter table offices enable row level security;
+alter table plans enable row level security;
+alter table profiles enable row level security;
 
--- Conciliações Bancárias
-create table reconciliations (
-    id uuid primary key default uuid_generate_v4(),
-    client_id uuid references clients(id) on delete cascade not null,
-    bank_statement_id uuid references bank_statements(id) on delete cascade not null,
-    journal_entry_id uuid references journal_entries(id) on delete set null,
-    invoice_id uuid references invoices(id) on delete set null,
-    status varchar(30) not null default 'pending',
-    divergence_reason text,
-    confirmed_by uuid references profiles(id),
-    confirmed_at timestamptz,
-    created_at timestamptz default now()
-);
+-- Função auxilIar para checar se é Super Admin
+create or replace function fn_is_super_admin()
+returns boolean as $$
+begin
+    return exists (
+        select 1 from profiles
+        where id = auth.uid() and role = 'super_admin'
+    );
+end;
+$$ language plpgsql security definer;
 
--- RLS
-alter table documents enable row level security;
-alter table bank_statements enable row level security;
-alter table invoices enable row level security;
-alter table reconciliations enable row level security;
+-- Políticas de RLS
+create policy "Super admins can manage offices"
+    on offices for all using ( public.fn_is_super_admin() );
 
-create policy "Access documents via client office"
-    on documents for all using (
+create policy "Office users can view their own office"
+    on offices for select using ( id in (select office_id from profiles where id = auth.uid()) );
+
+create policy "Plans are viewable by everyone authenticated"
+    on plans for select to authenticated using (true);
+
+create policy "Super admins manage plans"
+    on plans for all using ( public.fn_is_super_admin() );
+
+create policy "Users can view profiles in their office or super admins"
+    on profiles for select using (
         public.fn_is_super_admin() or 
-        client_id in (select id from clients where office_id in (select office_id from profiles where id = auth.uid()))
+        office_id in (select office_id from profiles where id = auth.uid())
     );
 
-create policy "Access bank statements via client office"
-    on bank_statements for all using (
+create policy "Super admins and office admins can manage profiles"
+    on profiles for all using (
         public.fn_is_super_admin() or 
-        client_id in (select id from clients where office_id in (select office_id from profiles where id = auth.uid()))
-    );
-
-create policy "Access invoices via client office"
-    on invoices for all using (
-        public.fn_is_super_admin() or 
-        client_id in (select id from clients where office_id in (select office_id from profiles where id = auth.uid()))
-    );
-
-create policy "Access reconciliations via client office"
-    on reconciliations for all using (
-        public.fn_is_super_admin() or 
-        client_id in (select id from clients where office_id in (select office_id from profiles where id = auth.uid()))
+        exists (
+            select 1 from profiles p 
+            where p.id = auth.uid() and p.office_id = profiles.office_id and p.role = 'office_admin'
+        )
     );
