@@ -3,49 +3,34 @@ import {
   Building2, Users, Building, Search, FileText, CheckCircle2, ShieldAlert, 
   Upload, CreditCard, DollarSign, Bell, UserCheck, ShieldCheck, 
   Bot, MessageSquare, Calendar, Lock, Trash2, Edit, Plus, Key, LogOut, Save, Download, 
-  FileSpreadsheet, AlertTriangle, Calculator, FileCheck, ChevronDown, ChevronRight, BarChart3, TrendingUp, RefreshCw, Layers
+  FileSpreadsheet, AlertTriangle, Calculator, FileCheck, ChevronDown, ChevronRight, RefreshCw, Eye
 } from 'lucide-react';
 
 export function Dashboard() {
-  // Autenticação e Perfis
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [userRole, setUserRole] = useState<'superadmin' | 'office' | 'client'>('office');
 
-  // Navegação Principal e Sub-Navegações
+  // Navegação Principal de Abas do CNPJ
   const [activeTab, setActiveTab] = useState('overview');
   const [activeSubTab, setActiveSubTab] = useState('cnpj-overview');
-  const [selectedClient, setSelectedClient] = useState('12.345.678/0001-90 - Empresa Exemplo Ltda');
+  const [reportSubTab, setReportSubTab] = useState('dre');
+
+  const [selectedClient, setSelectedClient] = useState('60.560.440 - ELISETE DA SILVA PIRES');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Expansão de Menus Laterais (Sub-abas dinâmicas)
-  const [isClientsMenuOpen, setIsClientsMenuOpen] = useState(true);
-  const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
-
-  // Configuração da API de IA do Escritório
   const [aiApiKey, setAiApiKey] = useState('sk-proj-********************************');
   const [aiProvider, setAiProvider] = useState('openai');
   const [keySaved, setKeySaved] = useState(false);
 
-  // Base de Dados de Escritórios (Visão Vendedora)
+  // Listas de Controlo
   const [officesList] = useState([
-    { id: 1, name: 'Escritório Contábil Alpha Ltda', email: 'contato@alpha.com', cnpj: '00.123.456/0001-00', plan: 'Enterprise (Licenciado)', activeClients: 42, status: 'Ativo' },
-    { id: 2, name: 'Beta Soluções Fiscais & Auditoria', email: 'adm@beta.com', cnpj: '11.987.654/0001-99', plan: 'Profissional (Licenciado)', activeClients: 18, status: 'Ativo' }
+    { id: 1, name: 'kG Contabilidade', email: 'elisete@kgcontabilidade.com', cnpj: '00.123.456/0001-00', plan: 'Enterprise (Licenciado)', activeClients: 1 }
   ]);
 
-  // Base de Clientes do Escritório
   const [clientsList] = useState([
-    { cnpj: '12.345.678/0001-90', name: 'Empresa Exemplo Ltda', regime: 'Simples Nacional', status: 'Em Dia', conciliation: '100%' },
-    { cnpj: '98.765.432/0001-10', name: 'Comércio de Bebidas SA', regime: 'Lucro Presumido', status: 'Divergência Notada', conciliation: '85%' },
-    { cnpj: '45.123.890/0001-55', name: 'Tech Solutions Serviços', regime: 'Simples Nacional', status: 'Em Dia', conciliation: '100%' }
-  ]);
-
-  // Base de Lançamentos para Conciliação Inteligente
-  const [reconciliations, setReconciliations] = useState([
-    { id: 1, date: '05/11/2026', desc: 'TED RECEBIDA CLIENTE ABC', val: '+ R$ 12.500,00', type: 'in', iaStatus: 'Nota Compatible (NF-e #459)', alert: false },
-    { id: 2, date: '06/11/2026', desc: 'PGTO FORNECEDOR XYZ', val: '- R$ 3.200,00', type: 'out', iaStatus: 'Comprovante Encontrado', alert: false },
-    { id: 3, date: '07/11/2026', desc: 'SAQUE CAIXA ELETRÔNICO UNIBANCO', val: '- R$ 1.500,00', type: 'out', iaStatus: 'Sem Comprovante Anexado', alert: true }
+    { cnpj: '60.560.440/0001-25', name: '60.560.440 ELISETE DA SILVA PIRES', regime: 'MEI', status: 'Ativa' }
   ]);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -54,7 +39,7 @@ export function Dashboard() {
     if (mail.includes('admin') || mail.includes('vendedora')) {
       setUserRole('superadmin');
       setActiveTab('super-admin');
-    } else if (mail.includes('cliente') || mail.includes('empresa')) {
+    } else if (mail.includes('cliente')) {
       setUserRole('client');
       setActiveTab('overview');
     } else {
@@ -70,54 +55,50 @@ export function Dashboard() {
     setTimeout(() => setKeySaved(false), 3000);
   };
 
-  // TELA DE LOGIN CORPORATIVA COM RESTRICAO TOTAL
+  // TELA DE LOGIN ESTILO CONTÁBIA
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100">
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl mx-auto flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
-              <Building2 className="w-7 h-7" />
+      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-4 font-sans text-[#1A2E22]">
+        <div className="bg-white border border-[#E6E2D6] rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6">
+          <div className="text-center space-y-3">
+            <div className="w-12 h-12 bg-[#C29B38] rounded-xl mx-auto flex items-center justify-center text-white shadow-md">
+              <span className="font-bold text-lg">王</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-white">ContabilCore SaaS</h1>
-            <p className="text-xs text-slate-400">Plataforma Avançada de Gestão & Auditoria Inteligente</p>
+            <h1 className="text-2xl font-bold tracking-tight text-[#1A2E22]">Contáb<span className="text-[#C29B38]">IA</span></h1>
+            <p className="text-xs text-slate-500">Use o e-mail e a senha liberados pelo seu escritório.</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4 text-xs">
             <div>
-              <label className="text-slate-300 block mb-1 font-semibold">E-mail de Acesso</label>
+              <label className="text-slate-600 block mb-1 font-medium">E-mail</label>
               <input 
                 type="email" 
                 required
-                placeholder="seu.email@escritorio.com" 
+                placeholder="contabiasaas@gmail.com" 
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-blue-500 transition-all"
+                className="w-full bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl p-3 text-slate-800 focus:outline-none focus:border-[#1A2E22]"
               />
             </div>
             <div>
-              <label className="text-slate-300 block mb-1 font-semibold">Senha Corporativa</label>
+              <label className="text-slate-600 block mb-1 font-medium">Senha</label>
               <input 
                 type="password" 
                 required
                 placeholder="••••••••" 
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-blue-500 transition-all"
+                className="w-full bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl p-3 text-slate-800 focus:outline-none focus:border-[#1A2E22]"
               />
             </div>
             <button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 text-sm"
+              className="w-full bg-[#1A2E22] hover:bg-[#2A4836] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg text-sm"
             >
-              Aceder ao Portal
+              Entrar
             </button>
-            
-            <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
-              <p className="font-bold text-slate-200 mb-1">Simular Perfil de Acesso:</p>
-              <p>• <span className="text-amber-400 font-semibold">Painel Vendedora (SaaS Master):</span> digite <code className="text-amber-300">admin</code> no e-mail</p>
-              <p>• <span className="text-blue-400 font-semibold">Painel da Contabilidade (B2B):</span> digite qualquer outro e-mail</p>
-              <p>• <span className="text-emerald-400 font-semibold">Portal do Cliente CNPJ:</span> digite <code className="text-emerald-300">cliente</code> no e-mail</p>
+            <div className="text-center pt-2">
+              <a href="#forgot" className="text-[#1A2E22] text-xs hover:underline">Esqueci minha senha</a>
             </div>
           </form>
         </div>
@@ -126,423 +107,171 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-600 selection:text-white overflow-hidden">
+    <div className="flex h-screen bg-[#FDFBF7] text-[#1A2E22] font-sans overflow-hidden">
       
-      {/* SIDEBAR CORPORATIVA EXPANSÍVEL */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
+      {/* SIDEBAR CORPORATIVA */}
+      <aside className="w-64 bg-[#1A2E22] text-[#FDFBF7] flex flex-col justify-between shrink-0">
         <div>
-          <div className="p-4 border-b border-slate-800 flex items-center space-x-3">
-            <div className="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20">
-              <Building2 className="w-5 h-5" />
+          <div className="p-4 border-b border-[#2A4836] flex items-center space-x-3">
+            <div className="bg-[#C29B38] p-2 rounded-xl text-white">
+              <span className="font-bold text-sm">王</span>
             </div>
-            <div className="overflow-hidden">
-              <h1 className="text-sm font-black text-white truncate">ContabilCore SaaS</h1>
-              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider truncate">
-                {userRole === 'superadmin' ? 'Master Vendedora' : userRole === 'client' ? 'Portal Empresa' : 'Painel Contábil'}
-              </p>
+            <div>
+              <h1 className="text-sm font-bold tracking-tight">Contáb<span className="text-[#C29B38]">IA</span></h1>
+              <p className="text-[10px] text-emerald-300">kG contabilidade</p>
             </div>
           </div>
 
-          {userRole !== 'client' && (
-            <div className="p-3">
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
-                <input 
-                  type="text" 
-                  placeholder="Buscar Cliente ou CNPJ..." 
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 transition-all"
-                />
-              </div>
+          <div className="p-3">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Buscar cliente por nome ou CNPJ..." 
+                className="w-full bg-[#122217] border border-[#2A4836] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none"
+              />
             </div>
-          )}
+          </div>
 
-          {/* MENU LATERAL COM SUB-CATEGORIAS E ABAS DE AÇÃO */}
-          <nav className="px-2 py-2 space-y-1 text-xs font-medium overflow-y-auto max-h-[calc(100vh-140px)]">
-            
-            {/* 1. VISÃO MASTER (APENAS VENDEDORA) */}
-            {userRole === 'superadmin' && (
-              <button 
-                onClick={() => setActiveTab('super-admin')} 
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'super-admin' ? 'bg-amber-600 text-white font-bold shadow-lg shadow-amber-600/20' : 'text-amber-400 hover:bg-slate-800'}`}
-              >
-                <span className="flex items-center"><Building className="w-4 h-4 mr-2.5" /> Gestão de Escritórios</span>
-                <span className="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.5 rounded">Master</span>
-              </button>
-            )}
-
-            {/* 2. PAINEL PRINCIPAL DE GESTÃO DO CNPJ */}
-            <button 
-              onClick={() => setActiveTab('overview')} 
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-            >
-              <span className="flex items-center"><Building2 className="w-4 h-4 mr-2.5" /> {userRole === 'client' ? 'Meu Espaço CNPJ' : 'Visão Geral & CNPJ'}</span>
+          <nav className="px-2 py-2 space-y-1 text-xs font-medium">
+            <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <Building2 className="w-4 h-4 mr-2.5" /> Painel geral
+            </button>
+            <button onClick={() => setActiveTab('clients')} className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'clients' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <Users className="w-4 h-4 mr-2.5" /> Clientes
             </button>
 
-            {/* 3. OPERAÇÃO COMPLETA DA CONTABILIDADE */}
-            {userRole !== 'client' && (
-              <>
-                {/* SUB-MENU EXPANSÍVEL: GERENCIAR CARTEIRA DE CLIENTES */}
-                <div>
-                  <button 
-                    onClick={() => setIsClientsMenuOpen(!isClientsMenuOpen)} 
-                    className="w-full flex items-center justify-between px-3 py-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all"
-                  >
-                    <span className="flex items-center"><Users className="w-4 h-4 mr-2.5 text-indigo-400" /> Carteira de Clientes</span>
-                    {isClientsMenuOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                  </button>
-                  {isClientsMenuOpen && (
-                    <div className="ml-6 pl-2 border-l border-slate-800 space-y-1 mt-1">
-                      <button 
-                        onClick={() => { setActiveTab('overview'); setActiveSubTab('cnpj-overview'); }}
-                        className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] transition-colors ${activeTab === 'overview' && activeSubTab === 'cnpj-overview' ? 'text-blue-400 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
-                      >
-                        • Cadastro & Dados Receita
-                      </button>
-                      <button 
-                        onClick={() => { setActiveTab('overview'); setActiveSubTab('reconciliation'); }}
-                        className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] transition-colors ${activeTab === 'overview' && activeSubTab === 'reconciliation' ? 'text-blue-400 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
-                      >
-                        • Conciliação Bancária
-                      </button>
-                      <button 
-                        onClick={() => { setActiveTab('overview'); setActiveSubTab('reports'); }}
-                        className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] transition-colors ${activeTab === 'overview' && activeSubTab === 'reports' ? 'text-blue-400 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
-                      >
-                        • Fechamento DRE & Balanço
-                      </button>
-                    </div>
-                  )}
-                </div>
+            <div className="pt-4 pb-1 px-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Inteligência</div>
+            <button onClick={() => setActiveTab('ai-audit')} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-audit' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <span className="flex items-center"><ShieldAlert className="w-4 h-4 mr-2.5 text-amber-400" /> Auditoria por IA</span>
+              <span className="bg-[#C29B38] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">ETAPA 2</span>
+            </button>
+            <button onClick={() => setActiveTab('ai-chat')} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-chat' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <span className="flex items-center"><Bot className="w-4 h-4 mr-2.5 text-blue-400" /> Chat contábil</span>
+              <span className="bg-[#C29B38] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">ETAPA 2</span>
+            </button>
 
-                <button 
-                  onClick={() => setActiveTab('users')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'users' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <UserCheck className="w-4 h-4 mr-2.5" /> Usuários e Permissões
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('ai-config')} 
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-config' ? 'bg-amber-600 text-white font-bold shadow-lg shadow-amber-600/20' : 'text-amber-400 hover:bg-slate-800'}`}
-                >
-                  <span className="flex items-center"><Key className="w-4 h-4 mr-2.5" /> Configurar Minha API de IA</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('ai-audit')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-audit' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <ShieldAlert className="w-4 h-4 mr-2.5 text-amber-400" /> Auditoria Fiscal Automatizada
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('ai-chat')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-chat' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <Bot className="w-4 h-4 mr-2.5 text-blue-400" /> Assistente IA Contábil
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('calendar')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'calendar' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <Calendar className="w-4 h-4 mr-2.5 text-purple-400" /> Calendário de Obrigação Fiscal
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('receivables')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'receivables' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <DollarSign className="w-4 h-4 mr-2.5 text-emerald-400" /> Honorários & Cobranças
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('payroll')} 
-                  className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'payroll' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-                >
-                  <Calculator className="w-4 h-4 mr-2.5 text-indigo-400" /> Folha e Pró-labore
-                </button>
-              </>
-            )}
+            <div className="pt-4 pb-1 px-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Administração</div>
+            <button onClick={() => setActiveTab('users')} className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'users' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <UserCheck className="w-4 h-4 mr-2.5" /> Usuários e acessos
+            </button>
+            <button onClick={() => setActiveTab('ai-config')} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-config' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <span className="flex items-center"><Key className="w-4 h-4 mr-2.5" /> Configuração de IA</span>
+              <span className="bg-[#C29B38] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">ETAPA 2</span>
+            </button>
           </nav>
         </div>
 
-        <div className="p-3 border-t border-slate-800 flex items-center justify-between">
-          <span className="text-[10px] text-emerald-400 font-semibold flex items-center"><ShieldCheck className="w-3.5 h-3.5 mr-1" /> LGPD Ativo</span>
-          <button onClick={() => setIsLoggedIn(false)} className="text-slate-400 hover:text-red-400 text-xs flex items-center font-medium transition-colors">
-            <LogOut className="w-3.5 h-3.5 mr-1" /> Sair
+        <div className="p-3 border-t border-[#2A4836] flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 bg-[#C29B38] rounded-full flex items-center justify-center font-bold text-xs text-white">EL</div>
+            <div className="overflow-hidden">
+              <p className="text-xs font-bold text-white truncate">Elisete</p>
+              <p className="text-[10px] text-slate-400 truncate">Dono da plataforma</p>
+            </div>
+          </div>
+          <button onClick={() => setIsLoggedIn(false)} className="text-slate-400 hover:text-red-300">
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </aside>
 
-      {/* ÁREA CENTRAL PRINCIPAL */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* ÁREA CENTRAL */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#FDFBF7]">
         
         {/* TOPBAR */}
-        <header className="h-14 bg-slate-900 border-b border-slate-800 px-6 flex items-center justify-between shrink-0">
-          <div className="flex items-center space-x-3">
-            <span className="text-xs font-semibold text-slate-400">Cliente CNPJ Selecionado:</span>
-            {userRole === 'client' ? (
-              <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20">12.345.678/0001-90 - Empresa Exemplo Ltda</span>
-            ) : (
-              <select 
-                value={selectedClient} 
-                onChange={(e) => setSelectedClient(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 font-bold focus:outline-none focus:border-blue-500"
-              >
-                {clientsList.map(c => (
-                  <option key={c.cnpj} value={`${c.cnpj} - ${c.name}`}>{c.cnpj} - {c.name}</option>
-                ))}
-              </select>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-              API de IA Operacional
-            </span>
-            <button className="p-1.5 text-slate-400 hover:text-white bg-slate-800 rounded-lg border border-slate-700 relative">
-              <Bell className="w-4 h-4" />
-              <span className="w-2 h-2 bg-blue-500 rounded-full absolute top-1 right-1"></span>
-            </button>
-            <div className="flex items-center space-x-2 pl-2 border-l border-slate-800">
-              <div className="w-7 h-7 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full flex items-center justify-center font-bold text-xs text-white">
-                {userRole === 'superadmin' ? 'SA' : userRole === 'client' ? 'CLI' : 'ESC'}
-              </div>
-              <span className="text-xs font-bold text-slate-200">
-                {userRole === 'superadmin' ? 'Super Admin Master' : userRole === 'client' ? 'Empresa CNPJ' : 'Escritório Contábil'}
-              </span>
-            </div>
+        <header className="h-16 bg-[#FDFBF7] border-b border-[#E6E2D6] px-6 flex items-center justify-between shrink-0">
+          <div className="relative w-96">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Buscar cliente por nome ou CNPJ..." 
+              className="w-full bg-white border border-[#E6E2D6] rounded-xl pl-9 pr-12 py-2 text-xs text-slate-700 focus:outline-none"
+            />
+            <span className="absolute right-3 top-2 text-[10px] bg-[#F4F1EA] text-slate-500 px-1.5 py-0.5 rounded border border-[#E6E2D6]">Ctrl K</span>
           </div>
         </header>
 
-        {/* ÁREA DE CONTEÚDO RENDERIZADA */}
-        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* CONTEÚDO */}
+        <main className="flex-1 overflow-y-auto p-8 space-y-6">
           
-          {/* ==================================================== */}
-          {/* 1. VISÃO GERAL DO CNPJ E TODAS AS SUB-ABAS */}
-          {/* ==================================================== */}
+          {/* PAINEL GERAL / CLIENTES */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              
-              {/* SUB-ABAS PRINCIPAIS */}
-              <div className="flex border-b border-slate-800 space-x-2 overflow-x-auto text-xs font-medium pb-1">
-                <button onClick={() => setActiveSubTab('cnpj-overview')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'cnpj-overview' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Visão Geral & Cadastro Receita</button>
-                <button onClick={() => setActiveSubTab('docs')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'docs' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Documentos & IA</button>
-                <button onClick={() => setActiveSubTab('reconciliation')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'reconciliation' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Conciliação Bancária</button>
-                <button onClick={() => setActiveSubTab('invoices')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'invoices' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Notas Fiscais & Lançamentos</button>
-                <button onClick={() => setActiveSubTab('chart-accounts')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'chart-accounts' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Plano de Contas</button>
-                <button onClick={() => setActiveSubTab('reports')} className={`px-4 py-2.5 rounded-t-xl transition-all border-b-2 ${activeSubTab === 'reports' ? 'border-blue-500 text-blue-400 bg-slate-900/80 font-bold' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>Relatórios (DRE / Balanço / Razão)</button>
-              </div>
-
-              {/* SUB-ABA: VISÃO GERAL & CADASTRO */}
-              {activeSubTab === 'cnpj-overview' && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Conciliação do Mês</p>
-                      <h3 className="text-3xl font-black text-emerald-400 mt-1">100%</h3>
-                      <p className="text-xs text-slate-400 mt-2 flex items-center">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mr-1" /> Todos os lançamentos batem com extrato
-                      </p>
-                    </div>
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Auditoria IA Auditora</p>
-                      <h3 className="text-3xl font-black text-blue-400 mt-1">Aprovado</h3>
-                      <p className="text-xs text-slate-400 mt-2">Nenhum risco tributário detectado</p>
-                    </div>
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Faturamento Acumulado</p>
-                      <h3 className="text-3xl font-black text-purple-400 mt-1">R$ 145.800,00</h3>
-                      <p className="text-xs text-slate-400 mt-2">Competência Atual (Novembro/2026)</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                      <h2 className="text-sm font-bold text-white flex items-center">
-                        <Building2 className="w-4 h-4 mr-2 text-blue-400" /> Dados Cadastrais Automáticos (Sincronizado Receita Federal)
-                      </h2>
-                      <button className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg flex items-center transition-all">
-                        <RefreshCw className="w-3.5 h-3.5 mr-1" /> Reconsultar CNPJ
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                      <div>
-                        <label className="text-slate-400 block mb-1">Razão Social</label>
-                        <input type="text" defaultValue="Empresa Exemplo Ltda" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200" />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 block mb-1">CNPJ</label>
-                        <input type="text" defaultValue="12.345.678/0001-90" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200" />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 block mb-1">Atividade Econômica (CNAE Principal)</label>
-                        <input type="text" defaultValue="6201-5/01 - Desenvolvimento de Programas de Computador" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200" />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 block mb-1">Regime Tributário</label>
-                        <input type="text" defaultValue="Simples Nacional - Anexo III" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200" />
-                      </div>
-                    </div>
-                  </div>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-[#1A2E22]">Olá, Elisete</h2>
+                  <p className="text-xs text-slate-500">Resumo do escritório em tempo real.</p>
                 </div>
-              )}
-
-              {/* SUB-ABA: DOCUMENTOS & IA */}
-              {activeSubTab === 'docs' && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl space-y-6">
-                  <div className="border-b border-slate-800 pb-4">
-                    <h2 className="text-base font-bold text-white flex items-center">
-                      <Upload className="w-5 h-5 mr-2 text-blue-400" /> Central de Uploads com Processamento IA
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-1">Suporta ficheiros em PDF, OFX, XML, CSV e imagens/fotos de comprovantes.</p>
-                  </div>
-                  <div className="border-2 border-dashed border-slate-700 rounded-2xl p-10 text-center hover:border-blue-500 transition-all bg-slate-950/50 group cursor-pointer">
-                    <Upload className="w-12 h-12 text-slate-500 group-hover:text-blue-400 mx-auto mb-3 transition-colors" />
-                    <p className="text-sm font-semibold text-slate-200 mb-1">Arraste seus comprovantes ou extratos bancários para aqui</p>
-                    <p className="text-xs text-slate-400 mb-6">A IA lê os valores, identifica a contrapartida no plano de contas e sugere a conciliação.</p>
-                    <label className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl cursor-pointer transition-all shadow-lg shadow-blue-600/30">
-                      <span>Selecionar Arquivo</span>
-                      <input type="file" className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
-                    </label>
-                    {selectedFile && <p className="text-xs text-emerald-400 mt-4 font-semibold">✓ Arquivo carregado: {selectedFile.name}</p>}
-                  </div>
-                </div>
-              )}
-
-              {/* SUB-ABA: CONCILIAÇÃO BANCÁRIA */}
-              {activeSubTab === 'reconciliation' && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <div>
-                      <h2 className="text-sm font-bold text-white">Conciliação Bancária & Auditoria de Extrato</h2>
-                      <p className="text-xs text-slate-400">A IA compara o extrato bancário com as notas fiscais enviadas.</p>
-                    </div>
-                    <span className="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-semibold">Segurança Humana Ativa</span>
-                  </div>
-
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-950 text-slate-400 border-b border-slate-800">
-                        <th className="p-3">Data</th>
-                        <th className="p-3">Descrição Extrato</th>
-                        <th className="p-3">Valor</th>
-                        <th className="p-3">Status Auditoria IA</th>
-                        <th className="p-3 text-right">Ação Contábil</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                      {reconciliations.map(r => (
-                        <tr key={r.id} className="hover:bg-slate-950/40">
-                          <td className="p-3 text-slate-300">{r.date}</td>
-                          <td className="p-3 font-semibold text-white">{r.desc}</td>
-                          <td className={`p-3 font-bold ${r.type === 'in' ? 'text-emerald-400' : 'text-red-400'}`}>{r.val}</td>
-                          <td className="p-3">
-                            <span className={`px-2.5 py-1 rounded-lg font-semibold ${r.alert ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
-                              {r.iaStatus}
-                            </span>
-                          </td>
-                          <td className="p-3 text-right">
-                            <button className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-semibold transition-colors">
-                              Confirmar Lançamento
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* SUB-ABA: RELATÓRIOS CONTÁBEIS */}
-              {activeSubTab === 'reports' && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-                  <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-                    <div>
-                      <h2 className="text-base font-bold text-white">Relatórios & Livros Contábeis Oficiais</h2>
-                      <p className="text-xs text-slate-400">Gere DRE, Balanço Patrimonial, Razonete e Livro Diário com 1 clique</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button className="bg-slate-800 hover:bg-slate-700 text-xs px-3.5 py-2 rounded-xl border border-slate-700 flex items-center font-semibold text-slate-200">
-                        <FileSpreadsheet className="w-4 h-4 mr-1.5 text-emerald-400" /> Exportar Excel (.xlsx)
-                      </button>
-                      <button className="bg-blue-600 hover:bg-blue-500 text-xs px-3.5 py-2 rounded-xl text-white flex items-center font-semibold transition-all">
-                        <Download className="w-4 h-4 mr-1.5" /> Imprimir Relatório PDF
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* DRE DETALHADA */}
-                  <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 text-xs space-y-3">
-                    <h3 className="font-bold text-blue-400 text-sm mb-4">Demonstração do Resultado do Exercício (DRE) - Novembro/2026</h3>
-                    <div className="flex justify-between border-b border-slate-900 pb-2">
-                      <span className="text-slate-300 font-semibold">(+) RECEITA BRUTA DE VENDAS E SERVIÇOS</span>
-                      <span className="font-extrabold text-emerald-400 text-sm">R$ 145.800,00</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-900 pb-2 text-slate-400">
-                      <span>(-) Impostos Faturados (Simples Nacional - DAS)</span>
-                      <span className="text-red-400 font-semibold">- R$ 8.748,00</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-900 pb-2 font-bold text-slate-200">
-                      <span>(=) RECEITA LÍQUIDA OPERACIONAL</span>
-                      <span>R$ 137.052,00</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-900 pb-2 text-slate-400">
-                      <span>(-) Custos Operacionais e Pró-labore Sócios</span>
-                      <span className="text-red-400 font-semibold">- R$ 42.100,00</span>
-                    </div>
-                    <div className="flex justify-between pt-3 text-base font-black text-emerald-400 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
-                      <span>(=) LUCRO LÍQUIDO DO PERÍODO</span>
-                      <span>R$ 94.952,00</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ==================================================== */}
-          {/* 2. PAINEL VENDEDORA (SUPER ADMIN MASTER) */}
-          {/* ==================================================== */}
-          {activeTab === 'super-admin' && userRole === 'superadmin' && (
-            <div className="space-y-6">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <h2 className="text-base font-bold text-amber-400 flex items-center">
-                  <Building className="w-5 h-5 mr-2" /> Painel da Vendedora: Licenciamento de Escritórios B2B
-                </h2>
-                <p className="text-xs text-slate-400">Cadastre os dados de login dos escritórios que adquiriram a licença. Cada escritório utilizará a própria API Key de IA sem custo adicional para si.</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <input type="text" placeholder="Razão Social do Escritório" className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200" />
-                  <input type="email" placeholder="E-mail de Login do Escritório" className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200" />
-                  <input type="password" placeholder="Senha Inicial" className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200" />
-                </div>
-                <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all">
-                  Licenciar Escritório Contábil
+                <button onClick={() => setActiveTab('clients')} className="bg-[#1A2E22] hover:bg-[#2A4836] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center shadow-md">
+                  <Building2 className="w-4 h-4 mr-2" /> Ver clientes
                 </button>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 className="text-sm font-bold text-white">Escritórios Clientes Ativos</h3>
-                <table className="w-full text-left text-xs border-collapse">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs text-slate-500 font-medium">CLIENTES ATIVOS</p>
+                  <h3 className="text-3xl font-bold text-[#1A2E22] mt-2">1</h3>
+                </div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs text-slate-500 font-medium">ITENS CONCILIADOS</p>
+                  <h3 className="text-3xl font-bold text-[#1A2E22] mt-2">0</h3>
+                  <p className="text-[11px] text-slate-400 mt-1">Extratos confirmados</p>
+                </div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs text-slate-500 font-medium">AGUARDANDO CONFIRMAÇÃO</p>
+                  <h3 className="text-3xl font-bold text-blue-600 mt-2">0</h3>
+                  <p className="text-[11px] text-slate-400 mt-1">Sugestões da IA</p>
+                </div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs text-slate-500 font-medium">DIVERGÊNCIAS</p>
+                  <h3 className="text-3xl font-bold text-red-500 mt-2">0</h3>
+                  <p className="text-[11px] text-slate-400 mt-1">0 documento(s) enviados</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* LISTA DE CLIENTES */}
+          {activeTab === 'clients' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-[#1A2E22]">Clientes</h2>
+                  <p className="text-xs text-slate-500">1 empresa(s) cadastrada(s). Cada uma tem seu próprio espaço com documentos, conciliação e relatórios.</p>
+                </div>
+                <button className="bg-[#1A2E22] hover:bg-[#2A4836] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center shadow-md">
+                  <Plus className="w-4 h-4 mr-2" /> Novo cliente
+                </button>
+              </div>
+
+              <div className="bg-white border border-[#E6E2D6] rounded-2xl p-6 shadow-sm space-y-4">
+                <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-slate-950 text-slate-400 border-b border-slate-800">
-                      <th className="p-3">Escritório</th>
-                      <th className="p-3">E-mail</th>
-                      <th className="p-3">Clientes Ativos</th>
-                      <th className="p-3">Status Licença</th>
+                    <tr className="border-b border-[#E6E2D6] text-slate-500 uppercase">
+                      <th className="pb-3">Empresa</th>
+                      <th className="pb-3">CNPJ</th>
+                      <th className="pb-3">Regime</th>
+                      <th className="pb-3">Escritório</th>
+                      <th className="pb-3 text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {officesList.map(off => (
-                      <tr key={off.id}>
-                        <td className="p-3 font-semibold text-white">{off.name}</td>
-                        <td className="p-3 text-slate-300">{off.email}</td>
-                        <td className="p-3 text-blue-400 font-bold">{off.activeClients} CNPJs</td>
-                        <td className="p-3"><span className="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">{off.plan}</span></td>
+                  <tbody className="divide-y divide-[#E6E2D6]">
+                    {clientsList.map((c, i) => (
+                      <tr key={i} className="hover:bg-[#FDFBF7]">
+                        <td className="py-4 font-bold text-[#1A2E22]">{c.name}</td>
+                        <td className="py-4 text-slate-600">{c.cnpj}</td>
+                        <td className="py-4"><span className="bg-[#F4F1EA] px-2.5 py-1 rounded-md font-semibold">{c.regime}</span></td>
+                        <td className="py-4 text-slate-600">kG contabilidade</td>
+                        <td className="py-4 text-right space-x-2">
+                          <button 
+                            onClick={() => setActiveTab('client-workspace')}
+                            className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-3 py-1.5 rounded-lg font-bold inline-flex items-center transition-colors"
+                          >
+                            Abrir <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                          </button>
+                          <button className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4 inline" /></button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -551,77 +280,203 @@ export function Dashboard() {
             </div>
           )}
 
-          {/* ==================================================== */}
-          {/* 3. CONFIGURAÇÃO DA CHAVE DE API DE IA DO ESCRITÓRIO */}
-          {/* ==================================================== */}
-          {activeTab === 'ai-config' && userRole !== 'client' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6 max-w-3xl">
-              <div className="border-b border-slate-800 pb-4">
-                <h2 className="text-base font-bold text-white flex items-center">
-                  <Key className="w-5 h-5 mr-2 text-amber-400" /> Configuração da Chave de API de IA Privada
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  Cole aqui a sua chave de API (OpenAI ou Claude). O consumo da IA é faturado diretamente pelo provedor para o seu escritório.
-                </p>
-              </div>
-
-              <form onSubmit={handleSaveApiKey} className="space-y-4 text-xs">
+          {/* ESPAÇO DO CLIENTE (CNPJ) */}
+          {activeTab === 'client-workspace' && (
+            <div className="space-y-6">
+              
+              {/* HEADER DO CLIENTE */}
+              <div className="bg-[#1A2E22] text-[#FDFBF7] rounded-2xl p-6 shadow-lg flex justify-between items-center">
                 <div>
-                  <label className="text-slate-300 block mb-1 font-semibold">Provedor de Inteligência Artificial</label>
-                  <select 
-                    value={aiProvider} 
-                    onChange={(e) => setAiProvider(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-semibold focus:outline-none"
-                  >
-                    <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
-                    <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
-                  </select>
+                  <span className="text-[10px] bg-[#C29B38] text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">MEI</span>
+                  <h2 className="text-2xl font-bold mt-1">60.560.440 ELISETE DA SILVA PIRES</h2>
+                  <p className="text-xs text-emerald-300 mt-0.5">CNPJ: 60.560.440/0001-25</p>
                 </div>
+                <span className="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1.5 rounded-full border border-emerald-500/30 font-bold">
+                  Receita: ATIVA
+                </span>
+              </div>
 
-                <div>
-                  <label className="text-slate-300 block mb-1 font-semibold">Sua Chave de API Secreta (API Key)</label>
-                  <input 
-                    type="password" 
-                    placeholder="sk-proj-..." 
-                    value={aiApiKey}
-                    onChange={(e) => setAiApiKey(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-blue-500"
-                  />
+              {/* ABAS DO CLIENTE */}
+              <div className="flex border-b border-[#E6E2D6] space-x-6 text-xs font-semibold">
+                <button onClick={() => setActiveSubTab('visao')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'visao' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Visão geral</button>
+                <button onClick={() => setActiveSubTab('docs')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'docs' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Documentos & IA</button>
+                <button onClick={() => setActiveSubTab('conciliacao')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'conciliacao' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Conciliação bancária</button>
+                <button onClick={() => setActiveSubTab('notas')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'notas' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Notas fiscais</button>
+                <button onClick={() => setActiveSubTab('lancamentos')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'lancamentos' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Lançamentos</button>
+                <button onClick={() => setActiveSubTab('plano')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'plano' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Plano de contas</button>
+                <button onClick={() => setActiveSubTab('relatorios')} className={`pb-3 border-b-2 transition-all ${activeSubTab === 'relatorios' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Relatórios</button>
+              </div>
+
+              {/* CONTEÚDO: VISÃO GERAL */}
+              {activeSubTab === 'visao' && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                    <p className="text-xs text-slate-500 font-medium">RECEITA 2026</p>
+                    <h3 className="text-2xl font-bold text-[#1A2E22] mt-2">R$ 0,00</h3>
+                  </div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                    <p className="text-xs text-slate-500 font-medium">RESULTADO DO ANO</p>
+                    <h3 className="text-2xl font-bold text-emerald-600 mt-2">R$ 0,00</h3>
+                    <p className="text-[10px] text-slate-400">Lucro</p>
+                  </div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                    <p className="text-xs text-slate-500 font-medium">SALDO CAIXA E BANCOS</p>
+                    <h3 className="text-2xl font-bold text-[#1A2E22] mt-2">R$ 0,00</h3>
+                  </div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
+                    <p className="text-xs text-slate-500 font-medium">CONCILIAÇÃO</p>
+                    <h3 className="text-2xl font-bold text-emerald-600 mt-2">0 ✓</h3>
+                    <p className="text-[10px] text-slate-400">0 a confirmar · 0 divergência(s)</p>
+                  </div>
                 </div>
+              )}
 
-                <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg flex items-center">
-                  <Save className="w-4 h-4 mr-1.5" /> Salvar Chave de API
-                </button>
-                {keySaved && <p className="text-xs text-emerald-400 font-semibold">✓ Chave gravada e pronta para auditar!</p>}
-              </form>
+              {/* CONTEÚDO: DOCUMENTOS & IA */}
+              {activeSubTab === 'docs' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-8 space-y-6 shadow-sm">
+                  <div className="border-2 border-dashed border-[#E6E2D6] rounded-2xl p-10 text-center bg-[#FDFBF7]">
+                    <Upload className="w-10 h-10 text-[#C29B38] mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-[#1A2E22]">Arraste extratos e notas aqui</h3>
+                    <p className="text-xs text-slate-500 mt-1">PDF, OFX, XML (NF-e), CSV ou foto (JPG/PNG) · até 20 MB</p>
+                    <label className="inline-block mt-4 bg-[#1A2E22] text-white text-xs font-bold px-5 py-2.5 rounded-xl cursor-pointer">
+                      <span>Selecionar arquivo</span>
+                      <input type="file" className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO: CONCILIAÇÃO BANCÁRIA */}
+              {activeSubTab === 'conciliacao' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">ITENS DO EXTRATO</p><h4 className="text-xl font-bold mt-1">0</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">CONCILIADOS</p><h4 className="text-xl font-bold text-emerald-600 mt-1">0</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">A CONFIRMAR</p><h4 className="text-xl font-bold text-blue-600 mt-1">0</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">DIVERGÊNCIAS</p><h4 className="text-xl font-bold text-red-500 mt-1">0</h4></div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center"><Plus className="w-3.5 h-3.5 mr-1.5" /> Incluir item</button>
+                    <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold flex items-center"><RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Reconciliar</button>
+                    <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold">Relatório de divergências</button>
+                    <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold">Imprimir</button>
+                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold">Confirmar todas as sugestões</button>
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO: NOTAS FISCAIS */}
+              {activeSubTab === 'notas' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">NOTAS</p><h4 className="text-xl font-bold mt-1">0</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">VENDAS (SAÍDAS)</p><h4 className="text-xl font-bold text-emerald-600 mt-1">R$ 0,00</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">COMPRAS (ENTRADAS)</p><h4 className="text-xl font-bold text-blue-600 mt-1">R$ 0,00</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">IMPOSTOS DESTACADOS</p><h4 className="text-xl font-bold text-purple-600 mt-1">R$ 0,00</h4></div>
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO: LANÇAMENTOS */}
+              {activeSubTab === 'lancamentos' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-3">
+                      <input type="text" placeholder="Histórico ou conta..." className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
+                      <input type="date" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
+                      <input type="date" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
+                    </div>
+                    <div className="space-x-2">
+                      <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold">CSV</button>
+                      <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center inline-flex"><Plus className="w-3.5 h-3.5 mr-1" /> Novo lançamento</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO: PLANO DE CONTAS */}
+              {activeSubTab === 'plano' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
+                  <div className="flex justify-between items-center border-b border-[#E6E2D6] pb-4">
+                    <p className="text-xs text-slate-500">46 contas. Contas com movimento não podem ser excluídas.</p>
+                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center"><Plus className="w-3.5 h-3.5 mr-1" /> Nova conta</button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="border border-[#E6E2D6] rounded-2xl p-4 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3">Ativo</h4>
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between p-2 bg-white rounded-lg border border-[#E6E2D6]"><span>1.1.01 · Caixa</span><span className="space-x-2"><Edit className="w-3.5 h-3.5 inline text-slate-500" /><Trash2 className="w-3.5 h-3.5 inline text-red-500" /></span></div>
+                        <div className="flex justify-between p-2 bg-white rounded-lg border border-[#E6E2D6]"><span>1.1.02 · Bancos Conta Movimento</span><span className="space-x-2"><Edit className="w-3.5 h-3.5 inline text-slate-500" /><Trash2 className="w-3.5 h-3.5 inline text-red-500" /></span></div>
+                      </div>
+                    </div>
+                    <div className="border border-[#E6E2D6] rounded-2xl p-4 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3">Passivo</h4>
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between p-2 bg-white rounded-lg border border-[#E6E2D6]"><span>2.1.01 · Fornecedores</span><span className="space-x-2"><Edit className="w-3.5 h-3.5 inline text-slate-500" /><Trash2 className="w-3.5 h-3.5 inline text-red-500" /></span></div>
+                        <div className="flex justify-between p-2 bg-white rounded-lg border border-[#E6E2D6]"><span>2.1.02 · Salários a Pagar</span><span className="space-x-2"><Edit className="w-3.5 h-3.5 inline text-slate-500" /><Trash2 className="w-3.5 h-3.5 inline text-red-500" /></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CONTEÚDO: RELATÓRIOS */}
+              {activeSubTab === 'relatorios' && (
+                <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
+                  {/* SUB-ABAS DE RELATÓRIOS */}
+                  <div className="flex border-b border-[#E6E2D6] space-x-4 text-xs font-semibold pb-3">
+                    <button onClick={() => setReportSubTab('dre')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'dre' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>DRE</button>
+                    <button onClick={() => setReportSubTab('balanco')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'balanco' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balanço patrimonial</button>
+                    <button onClick={() => setReportSubTab('fluxo')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'fluxo' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Fluxo de caixa</button>
+                    <button onClick={() => setReportSubTab('balancete')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'balancete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balancete</button>
+                    <button onClick={() => setReportSubTab('razonete')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'razonete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Razonete</button>
+                    <button onClick={() => setReportSubTab('razao')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'razao' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro razão</button>
+                    <button onClick={() => setReportSubTab('diario')} className={`px-3 py-1.5 rounded-lg transition-colors ${reportSubTab === 'diario' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro diário</button>
+                  </div>
+
+                  {/* FILTROS E BOTÕES DE EXPORTAÇÃO */}
+                  <div className="flex justify-between items-center text-xs">
+                    <div className="flex space-x-2 items-center">
+                      <span>De:</span>
+                      <input type="date" defaultValue="2026-01-01" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-1.5" />
+                      <span>Até:</span>
+                      <input type="date" defaultValue="2026-11-09" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-1.5" />
+                    </div>
+                    <div className="space-x-2">
+                      <button className="bg-[#F4F1EA] border border-[#E6E2D6] px-3.5 py-2 rounded-xl font-bold">Excel (CSV)</button>
+                      <button className="bg-[#1A2E22] text-white px-3.5 py-2 rounded-xl font-bold">Imprimir / PDF</button>
+                    </div>
+                  </div>
+
+                  {/* VISUALIZADOR DE RELATÓRIO */}
+                  <div className="bg-[#FDFBF7] border border-[#E6E2D6] rounded-2xl p-8 text-center space-y-3">
+                    <h3 className="text-lg font-bold text-[#1A2E22] capitalize">{reportSubTab.replace('-', ' ')} Automatizado</h3>
+                    <p className="text-xs text-slate-500">Período: 01/01/2026 a 09/11/2026 · Calculado automaticamente pelo plano de contas e lançamentos.</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* DEMAIS MÓDULOS DE SUPORTE */}
-          {activeTab === 'users' && userRole !== 'client' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <h2 className="text-base font-bold text-white">Controle de Usuários e Permissões</h2>
-              <p className="text-xs text-slate-400">Crie ou remova acessos dos contadores e clientes sem cadastro aberto.</p>
+          {/* PAINEL VENDEDORA (SUPER ADMIN) */}
+          {activeTab === 'super-admin' && (
+            <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 shadow-sm space-y-4">
+              <h2 className="text-lg font-bold text-[#1A2E22]">Painel Master da Vendedora</h2>
+              <p className="text-xs text-slate-500">Gestão dos escritórios parceiros licenciados no SaaS ContábIA.</p>
             </div>
           )}
 
-          {activeTab === 'ai-audit' && userRole !== 'client' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <h2 className="text-base font-bold text-white flex items-center text-amber-400">
-                <ShieldAlert className="w-5 h-5 mr-2" /> Auditoria Fiscal Automatizada
-              </h2>
-              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300 font-semibold">
-                ✓ IA verificou 145 lançamentos sem detectar divergências de impostos ou saídas sem nota.
-              </div>
+          {/* OUTRAS ABAS MASTER */}
+          {activeTab === 'users' && (
+            <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-[#1A2E22]">Usuários e Acessos do Escritório</h2>
             </div>
           )}
 
-          {activeTab === 'ai-chat' && userRole !== 'client' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[450px]">
-              <h2 className="text-base font-bold text-white mb-4">Assistente IA Contábil Própria</h2>
-              <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-blue-200">
-                Assistente operacional pronto utilizando a chave de API cadastrada pelo seu escritório.
-              </div>
+          {activeTab === 'ai-config' && (
+            <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 shadow-sm space-y-4">
+              <h2 className="text-lg font-bold text-[#1A2E22]">Configuração da Chave de API de IA</h2>
+              <p className="text-xs text-slate-500">Cada escritório insere a sua própria chave para automação ilimitada.</p>
             </div>
           )}
 
