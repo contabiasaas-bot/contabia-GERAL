@@ -3,7 +3,7 @@ import {
   Building2, Users, Search, FileText, CheckCircle2, ShieldAlert, 
   Upload, CreditCard, DollarSign, Bell, UserCheck, ShieldCheck, 
   Bot, Calendar, Trash2, Edit, Plus, Key, LogOut, Download, 
-  FileSpreadsheet, RefreshCw, ChevronRight
+  FileSpreadsheet, RefreshCw, ChevronRight, Calculator, FileCheck
 } from 'lucide-react';
 
 export function Dashboard() {
@@ -11,13 +11,8 @@ export function Dashboard() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   
-  // Navegação Principal
   const [activeTab, setActiveTab] = useState<'overview' | 'clients' | 'client-workspace' | 'super-admin' | 'users' | 'ai-config' | 'ai-audit' | 'ai-chat'>('overview');
-  
-  // Sub-abas do Espaço do Cliente (CNPJ)
   const [activeSubTab, setActiveSubTab] = useState<'visao' | 'docs' | 'conciliacao' | 'notas' | 'lancamentos' | 'plano' | 'relatorios'>('visao');
-  
-  // Sub-abas de Relatórios
   const [reportSubTab, setReportSubTab] = useState<'dre' | 'balanco' | 'fluxo' | 'balancete' | 'razonete' | 'razao' | 'diario'>('dre');
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -25,6 +20,21 @@ export function Dashboard() {
   const [clientsList] = useState([
     { cnpj: '60.560.440/0001-25', name: '60.560.440 ELISETE DA SILVA PIRES', regime: 'MEI', status: 'Ativa' }
   ]);
+
+  const [accountsList] = useState({
+    ativo: [
+      { code: '1.1.01', name: 'Caixa' },
+      { code: '1.1.02', name: 'Bancos Conta Movimento' },
+      { code: '1.1.03', name: 'Aplicações Financeiras' },
+      { code: '1.1.04', name: 'Clientes a Receber' }
+    ],
+    passivo: [
+      { code: '2.1.01', name: 'Fornecedores' },
+      { code: '2.1.02', name: 'Salários a Pagar' },
+      { code: '2.1.03', name: 'Encargos Sociais (INSS/FGTS)' },
+      { code: '2.1.04', name: 'Impostos a Recolher' }
+    ]
+  });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +80,7 @@ export function Dashboard() {
               type="submit" 
               className="w-full bg-[#1A2E22] hover:bg-[#2A4836] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg text-sm"
             >
-              Entrar
+              Entrar no portal
             </button>
           </form>
         </div>
@@ -81,7 +91,7 @@ export function Dashboard() {
   return (
     <div className="flex h-screen bg-[#FDFBF7] text-[#1A2E22] font-sans overflow-hidden">
       
-      {/* SIDEBAR CORPORATIVA */}
+      {/* SIDEBAR CORPORATIVA EXATA */}
       <aside className="w-64 bg-[#1A2E22] text-[#FDFBF7] flex flex-col justify-between shrink-0">
         <div>
           <div className="p-4 border-b border-[#2A4836] flex items-center space-x-3">
@@ -94,7 +104,18 @@ export function Dashboard() {
             </div>
           </div>
 
-          <nav className="px-2 py-3 space-y-1 text-xs font-medium">
+          <div className="p-3">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Buscar cliente..." 
+                className="w-full bg-[#122217] border border-[#2A4836] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <nav className="px-2 py-1 space-y-1 text-xs font-medium">
             <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
               <Building2 className="w-4 h-4 mr-2.5" /> Painel geral
             </button>
@@ -109,6 +130,15 @@ export function Dashboard() {
             </button>
             <button onClick={() => setActiveTab('ai-chat')} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-chat' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
               <span className="flex items-center"><Bot className="w-4 h-4 mr-2.5 text-blue-400" /> Chat contábil</span>
+              <span className="bg-[#C29B38] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">ETAPA 2</span>
+            </button>
+
+            <div className="pt-4 pb-1 px-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Administração</div>
+            <button onClick={() => setActiveTab('users')} className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all ${activeTab === 'users' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <UserCheck className="w-4 h-4 mr-2.5" /> Usuários e acessos
+            </button>
+            <button onClick={() => setActiveTab('ai-config')} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeTab === 'ai-config' ? 'bg-[#2A4836] text-white font-bold' : 'text-slate-300 hover:bg-[#2A4836]/50'}`}>
+              <span className="flex items-center"><Key className="w-4 h-4 mr-2.5" /> Configuração de IA</span>
               <span className="bg-[#C29B38] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">ETAPA 2</span>
             </button>
           </nav>
@@ -139,6 +169,7 @@ export function Dashboard() {
               placeholder="Buscar cliente por nome ou CNPJ..." 
               className="w-full bg-white border border-[#E6E2D6] rounded-xl pl-9 pr-12 py-2 text-xs text-slate-700 focus:outline-none"
             />
+            <span className="absolute right-3 top-2 text-[10px] bg-[#F4F1EA] text-slate-500 px-1.5 py-0.5 rounded border border-[#E6E2D6]">Ctrl K</span>
           </div>
         </header>
 
@@ -158,33 +189,21 @@ export function Dashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs text-slate-500 font-medium">CLIENTES ATIVOS</p>
-                  <h3 className="text-3xl font-bold text-[#1A2E22] mt-2">1</h3>
-                </div>
-                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs text-slate-500 font-medium">ITENS CONCILIADOS</p>
-                  <h3 className="text-3xl font-bold text-[#1A2E22] mt-2">0</h3>
-                </div>
-                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs text-slate-500 font-medium">AGUARDANDO CONFIRMAÇÃO</p>
-                  <h3 className="text-3xl font-bold text-blue-600 mt-2">0</h3>
-                </div>
-                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm">
-                  <p className="text-xs text-slate-500 font-medium">DIVERGÊNCIAS</p>
-                  <h3 className="text-3xl font-bold text-red-500 mt-2">0</h3>
-                </div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">CLIENTES ATIVOS</p><h3 className="text-3xl font-bold text-[#1A2E22] mt-2">1</h3></div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">ITENS CONCILIADOS</p><h3 className="text-3xl font-bold text-[#1A2E22] mt-2">0</h3></div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">AGUARDANDO CONFIRMAÇÃO</p><h3 className="text-3xl font-bold text-blue-600 mt-2">0</h3></div>
+                <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">DIVERGÊNCIAS</p><h3 className="text-3xl font-bold text-red-500 mt-2">0</h3></div>
               </div>
             </div>
           )}
 
-          {/* LISTA DE CLIENTES */}
+          {/* LISTA DE CLIENTES COM O BOTÃO ABRIR FUNCIONAL */}
           {activeTab === 'clients' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-[#1A2E22]">Clientes</h2>
-                  <p className="text-xs text-slate-500">1 empresa(s) cadastrada(s). Cada uma tem seu próprio espaço.</p>
+                  <p className="text-xs text-slate-500">1 empresa(s) cadastrada(s). Cada uma tem seu próprio espaço com documentos, conciliação e relatórios.</p>
                 </div>
                 <button className="bg-[#1A2E22] hover:bg-[#2A4836] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center shadow-md">
                   <Plus className="w-4 h-4 mr-2" /> Novo cliente
@@ -198,6 +217,7 @@ export function Dashboard() {
                       <th className="pb-3">Empresa</th>
                       <th className="pb-3">CNPJ</th>
                       <th className="pb-3">Regime</th>
+                      <th className="pb-3">Escritório</th>
                       <th className="pb-3 text-right">Ações</th>
                     </tr>
                   </thead>
@@ -207,13 +227,15 @@ export function Dashboard() {
                         <td className="py-4 font-bold text-[#1A2E22]">{c.name}</td>
                         <td className="py-4 text-slate-600">{c.cnpj}</td>
                         <td className="py-4"><span className="bg-[#F4F1EA] px-2.5 py-1 rounded-md font-semibold">{c.regime}</span></td>
-                        <td className="py-4 text-right">
+                        <td className="py-4 text-slate-600">kG contabilidade</td>
+                        <td className="py-4 text-right space-x-2">
                           <button 
                             onClick={() => setActiveTab('client-workspace')}
-                            className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-3 py-1.5 rounded-lg font-bold inline-flex items-center transition-colors"
+                            className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-3.5 py-1.5 rounded-lg font-bold inline-flex items-center transition-colors"
                           >
                             Abrir <ChevronRight className="w-3.5 h-3.5 ml-1" />
                           </button>
+                          <button className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4 inline" /></button>
                         </td>
                       </tr>
                     ))}
@@ -223,7 +245,7 @@ export function Dashboard() {
             </div>
           )}
 
-          {/* ESPAÇO DO CLIENTE (CNPJ) COM TODAS AS ABAS FUNCIONAIS */}
+          {/* ESPAÇO DO CLIENTE (CNPJ) COM TODAS AS ABAS REQUISITADAS */}
           {activeTab === 'client-workspace' && (
             <div className="space-y-6">
               
@@ -233,12 +255,17 @@ export function Dashboard() {
                   <h2 className="text-2xl font-bold mt-1">60.560.440 ELISETE DA SILVA PIRES</h2>
                   <p className="text-xs text-emerald-300 mt-0.5">CNPJ: 60.560.440/0001-25</p>
                 </div>
-                <button onClick={() => setActiveTab('clients')} className="bg-[#2A4836] text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                  ← Voltar para Clientes
-                </button>
+                <div className="flex items-center space-x-3">
+                  <span className="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1.5 rounded-full border border-emerald-500/30 font-bold">
+                    Receita: ATIVA
+                  </span>
+                  <button onClick={() => setActiveTab('clients')} className="bg-[#2A4836] hover:bg-[#355C45] text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-colors">
+                    ← Voltar
+                  </button>
+                </div>
               </div>
 
-              {/* ABAS DO CLIENTE */}
+              {/* ABAS INTERNAS DO CLIENTE */}
               <div className="flex border-b border-[#E6E2D6] space-x-6 text-xs font-semibold overflow-x-auto">
                 <button onClick={() => setActiveSubTab('visao')} className={`pb-3 border-b-2 transition-all whitespace-nowrap ${activeSubTab === 'visao' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Visão geral</button>
                 <button onClick={() => setActiveSubTab('docs')} className={`pb-3 border-b-2 transition-all whitespace-nowrap ${activeSubTab === 'docs' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Documentos & IA</button>
@@ -249,30 +276,33 @@ export function Dashboard() {
                 <button onClick={() => setActiveSubTab('relatorios')} className={`pb-3 border-b-2 transition-all whitespace-nowrap ${activeSubTab === 'relatorios' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Relatórios</button>
               </div>
 
-              {/* CONTEÚDO DAS SUB-ABAS */}
+              {/* 1. VISÃO GERAL */}
               {activeSubTab === 'visao' && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">RECEITA 2026</p><h3 className="text-2xl font-bold text-[#1A2E22] mt-2">R$ 0,00</h3></div>
-                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">RESULTADO DO ANO</p><h3 className="text-2xl font-bold text-emerald-600 mt-2">R$ 0,00</h3></div>
-                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">CAIXA E BANCOS</p><h3 className="text-2xl font-bold text-[#1A2E22] mt-2">R$ 0,00</h3></div>
-                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">CONCILIAÇÃO</p><h3 className="text-2xl font-bold text-emerald-600 mt-2">0 ✓</h3></div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">RESULTADO DO ANO</p><h3 className="text-2xl font-bold text-emerald-600 mt-2">R$ 0,00</h3><p className="text-[10px] text-slate-400">Lucro</p></div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">SALDO CAIXA E BANCOS</p><h3 className="text-2xl font-bold text-[#1A2E22] mt-2">R$ 0,00</h3></div>
+                  <div className="bg-white border border-[#E6E2D6] rounded-2xl p-5 shadow-sm"><p className="text-xs text-slate-500 font-medium">CONCILIAÇÃO</p><h3 className="text-2xl font-bold text-emerald-600 mt-2">0 ✓</h3><p className="text-[10px] text-slate-400">0 a confirmar · 0 divergência(s)</p></div>
                 </div>
               )}
 
+              {/* 2. DOCUMENTOS & IA */}
               {activeSubTab === 'docs' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-8 space-y-6 shadow-sm">
                   <div className="border-2 border-dashed border-[#E6E2D6] rounded-2xl p-10 text-center bg-[#FDFBF7]">
                     <Upload className="w-10 h-10 text-[#C29B38] mx-auto mb-3" />
                     <h3 className="text-base font-bold text-[#1A2E22]">Arraste extratos e notas aqui</h3>
-                    <p className="text-xs text-slate-500 mt-1">PDF, OFX, XML, CSV ou foto · até 20 MB</p>
+                    <p className="text-xs text-slate-500 mt-1">PDF, OFX, XML (NF-e), CSV ou foto (JPG/PNG) · até 20 MB</p>
                     <label className="inline-block mt-4 bg-[#1A2E22] text-white text-xs font-bold px-5 py-2.5 rounded-xl cursor-pointer">
                       <span>Selecionar arquivo</span>
                       <input type="file" className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
                     </label>
+                    {selectedFile && <p className="text-xs text-emerald-600 mt-3 font-bold">Arquivo pronto: {selectedFile.name}</p>}
                   </div>
                 </div>
               )}
 
+              {/* 3. CONCILIAÇÃO BANCÁRIA */}
               {activeSubTab === 'conciliacao' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
                   <div className="grid grid-cols-4 gap-4">
@@ -281,56 +311,128 @@ export function Dashboard() {
                     <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">A CONFIRMAR</p><h4 className="text-xl font-bold text-blue-600 mt-1">0</h4></div>
                     <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">DIVERGÊNCIAS</p><h4 className="text-xl font-bold text-red-500 mt-1">0</h4></div>
                   </div>
-                  <div className="flex space-x-3">
-                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center"><Plus className="w-3.5 h-3.5 mr-1.5" /> Incluir item</button>
-                    <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold flex items-center"><RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Reconciliar</button>
+                  <div className="flex flex-wrap gap-3">
+                    <button className="bg-[#1A2E22] text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center shadow-md"><Plus className="w-3.5 h-3.5 mr-1.5" /> Incluir item</button>
+                    <button className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center"><RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Reconciliar</button>
+                    <button className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-4 py-2.5 rounded-xl text-xs font-bold">Relatório de divergências</button>
+                    <button className="bg-[#E6E2D6] hover:bg-[#D5D0C0] text-[#1A2E22] px-4 py-2.5 rounded-xl text-xs font-bold">Imprimir</button>
+                    <button className="bg-[#1A2E22] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md">Confirmar todas as sugestões</button>
                   </div>
                 </div>
               )}
 
+              {/* 4. NOTAS FISCAIS */}
               {activeSubTab === 'notas' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
                   <div className="grid grid-cols-4 gap-4">
                     <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">NOTAS</p><h4 className="text-xl font-bold mt-1">0</h4></div>
                     <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">VENDAS (SAÍDAS)</p><h4 className="text-xl font-bold text-emerald-600 mt-1">R$ 0,00</h4></div>
                     <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">COMPRAS (ENTRADAS)</p><h4 className="text-xl font-bold text-blue-600 mt-1">R$ 0,00</h4></div>
-                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">IMPOSTOS</p><h4 className="text-xl font-bold text-purple-600 mt-1">R$ 0,00</h4></div>
+                    <div className="p-4 bg-[#FDFBF7] rounded-2xl border border-[#E6E2D6]"><p className="text-xs text-slate-500">IMPOSTOS DESTACADOS</p><h4 className="text-xl font-bold text-purple-600 mt-1">R$ 0,00</h4></div>
                   </div>
                 </div>
               )}
 
+              {/* 5. LANÇAMENTOS */}
               {activeSubTab === 'lancamentos' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
                   <div className="flex justify-between items-center">
-                    <div className="flex space-x-3">
-                      <input type="text" placeholder="Histórico ou conta..." className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
+                    <div className="flex space-x-3 items-center">
+                      <input type="text" placeholder="Histórico ou conta..." className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3.5 py-2 text-xs" />
+                      <input type="date" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
+                      <input type="date" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-2 text-xs" />
                     </div>
-                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center"><Plus className="w-3.5 h-3.5 mr-1" /> Novo lançamento</button>
+                    <div className="space-x-2">
+                      <button className="bg-[#E6E2D6] text-[#1A2E22] px-4 py-2 rounded-xl text-xs font-bold">CSV</button>
+                      <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center inline-flex shadow-md"><Plus className="w-3.5 h-3.5 mr-1" /> Novo lançamento</button>
+                    </div>
                   </div>
                 </div>
               )}
 
+              {/* 6. PLANO DE CONTAS */}
               {activeSubTab === 'plano' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
-                  <p className="text-xs text-slate-500">Plano de contas estruturado (Ativo, Passivo, Receitas, Custos, Despesas, Patrimônio Líquido).</p>
+                  <div className="flex justify-between items-center border-b border-[#E6E2D6] pb-4">
+                    <p className="text-xs text-slate-500">Estrutura contábil (Ativo, Passivo, Patrimônio Líquido, Receitas, Custos e Despesas).</p>
+                    <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center shadow-md"><Plus className="w-3.5 h-3.5 mr-1" /> Nova conta</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Ativo</h4>
+                      <div className="space-y-2 text-xs">
+                        {accountsList.ativo.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Passivo</h4>
+                      <div className="space-y-2 text-xs">
+                        {accountsList.passivo.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
+              {/* 7. RELATÓRIOS (DRE, BALANÇO, FLUXO DE CAIXA, BALANCETE, RAZONETE, LIVRO RAZÃO, LIVRO DIÁRIO) */}
               {activeSubTab === 'relatorios' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
-                  <div className="flex border-b border-[#E6E2D6] space-x-4 text-xs font-semibold pb-3 overflow-x-auto">
-                    <button onClick={() => setReportSubTab('dre')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'dre' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>DRE</button>
-                    <button onClick={() => setReportSubTab('balanco')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'balanco' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balanço patrimonial</button>
-                    <button onClick={() => setReportSubTab('fluxo')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'fluxo' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Fluxo de caixa</button>
-                    <button onClick={() => setReportSubTab('balancete')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'balancete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balancete</button>
-                    <button onClick={() => setReportSubTab('razonete')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'razonete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Razonete</button>
-                    <button onClick={() => setReportSubTab('razao')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'razao' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro razão</button>
-                    <button onClick={() => setReportSubTab('diario')} className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${reportSubTab === 'diario' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro diário</button>
+                  <div className="flex border-b border-[#E6E2D6] space-x-3 text-xs font-semibold pb-3 overflow-x-auto">
+                    <button onClick={() => setReportSubTab('dre')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'dre' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>DRE</button>
+                    <button onClick={() => setReportSubTab('balanco')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'balanco' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balanço patrimonial</button>
+                    <button onClick={() => setReportSubTab('fluxo')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'fluxo' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Fluxo de caixa</button>
+                    <button onClick={() => setReportSubTab('balancete')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'balancete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Balancete</button>
+                    <button onClick={() => setReportSubTab('razonete')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'razonete' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Razonete</button>
+                    <button onClick={() => setReportSubTab('razao')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'razao' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro razão</button>
+                    <button onClick={() => setReportSubTab('diario')} className={`px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap ${reportSubTab === 'diario' ? 'bg-[#1A2E22] text-white font-bold' : 'text-slate-600 hover:bg-[#F4F1EA]'}`}>Livro diário</button>
                   </div>
 
-                  <div className="bg-[#FDFBF7] border border-[#E6E2D6] rounded-2xl p-8 text-center space-y-3">
+                  <div className="flex justify-between items-center text-xs">
+                    <div className="flex space-x-2 items-center">
+                      <span className="font-medium text-slate-600">De:</span>
+                      <input type="date" defaultValue="2026-01-01" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-1.5 font-medium" />
+                      <span className="font-medium text-slate-600">Até:</span>
+                      <input type="date" defaultValue="2026-11-09" className="bg-[#F4F1EA] border border-[#E6E2D6] rounded-xl px-3 py-1.5 font-medium" />
+                    </div>
+                    <div className="space-x-2">
+                      <button className="bg-[#F4F1EA] border border-[#E6E2D6] hover:bg-[#E6E2D6] px-4 py-2 rounded-xl font-bold transition-colors">Excel (CSV)</button>
+                      <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl font-bold shadow-md">Imprimir / PDF</button>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#FDFBF7] border border-[#E6E2D6] rounded-2xl p-8 text-center space-y-4">
                     <h3 className="text-lg font-bold text-[#1A2E22] capitalize">{reportSubTab.replace('-', ' ')} Automatizado</h3>
-                    <p className="text-xs text-slate-500">Calculado automaticamente pelos lançamentos contábeis.</p>
+                    <p className="text-xs text-slate-500">Período: 01/01/2026 a 09/11/2026 · Calculado automaticamente pelo plano de contas e lançamentos.</p>
+                    <div className="p-6 bg-white border border-[#E6E2D6] rounded-2xl text-left text-xs space-y-3 max-w-2xl mx-auto shadow-sm">
+                      <div className="flex justify-between font-semibold border-b border-[#E6E2D6] pb-2">
+                        <span className="text-slate-600">Total de Entradas / Receitas</span>
+                        <span className="text-emerald-600 font-bold">R$ 0,00</span>
+                      </div>
+                      <div className="flex justify-between font-semibold border-b border-[#E6E2D6] pb-2">
+                        <span className="text-slate-600">Total de Saídas / Despesas</span>
+                        <span className="text-red-500 font-bold">R$ 0,00</span>
+                      </div>
+                      <div className="flex justify-between font-black text-sm pt-1 text-[#1A2E22]">
+                        <span>Resultado Líquido</span>
+                        <span>R$ 0,00</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
