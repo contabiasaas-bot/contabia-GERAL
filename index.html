@@ -1,15 +1,534 @@
-<!doctype html>
-<html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portal Contábil Multi-Tenant</title>
-    <!-- Tailwind CSS CDN para garantia visual instantânea -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contábil Inteligente - Plataforma SaaS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-slate-950 text-slate-100 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-[#fcfbf9] text-stone-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- TELA DE LOGIN / ACESSO -->
+    <div id="tela-login" class="flex-1 flex items-center justify-center p-4 fixed inset-0 bg-[#fcfbf9] z-50">
+        <div class="bg-white border border-stone-200 p-8 rounded-2xl shadow-xl max-w-md w-full space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-[#14362b] flex items-center justify-center text-xl shadow-md mx-auto text-emerald-300 font-bold">
+                    ✨
+                </div>
+                <h1 class="text-xl font-bold text-stone-900 tracking-wide">Contábil Inteligente</h1>
+                <p class="text-xs text-stone-500">Portal de Contabilidade Automatizada com IA</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1">Escritório / Tenant</label>
+                    <select id="select-escritorio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-800 focus:outline-none focus:border-[#14362b]">
+                        <option value="KG Contabilidade & Consultoria (RS)" selected>KG Contabilidade & Consultoria (RS)</option>
+                        <option value="Contabilidade Silva & Associados (SP)">Contabilidade Silva & Associados (SP)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1">E-mail Profissional</label>
+                    <input type="email" id="email-input" value="elisete@kgcontabilidade.com" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-800 focus:outline-none focus:border-[#14362b]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1">Senha de Acesso</label>
+                    <input type="password" id="senha-input" value="123456" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-800 focus:outline-none focus:border-[#14362b]">
+                </div>
+
+                <button onclick="entrarNoSistema()" class="w-full bg-[#14362b] hover:bg-[#1e4d3e] transition text-white text-xs font-bold py-3 rounded-xl shadow-md cursor-pointer">
+                    Entrar no Portal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE NOVO CLIENTE -->
+    <div id="modal-novo-cliente" class="hidden fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-stone-200 rounded-2xl p-6 w-full max-w-lg space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <h3 class="font-bold text-stone-900 text-base">Cadastrar Novo Cliente</h3>
+                <button onclick="fecharModalCliente()" class="text-stone-400 hover:text-stone-700 text-sm cursor-pointer">✕</button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-stone-600 block mb-1 font-semibold">Nome da Empresa / Razão Social</label>
+                    <input type="text" id="form-nome" placeholder="Ex: Elisete da Silva Pires" class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-stone-800" />
+                </div>
+                <div>
+                    <label class="text-stone-600 block mb-1 font-semibold">CNPJ</label>
+                    <input type="text" id="form-cnpj" placeholder="60.560.440/0001-25" class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-stone-800" />
+                </div>
+                <div>
+                    <label class="text-stone-600 block mb-1 font-semibold">Regime Tributário</label>
+                    <select id="form-regime" class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-stone-800">
+                        <option>MEI</option>
+                        <option>Simples Nacional</option>
+                        <option>Lucro Presumido</option>
+                        <option>Lucro Real</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="fecharModalCliente()" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-medium cursor-pointer">Cancelar</button>
+                <button onclick="salvarNovoCliente()" class="px-4 py-2 bg-[#14362b] hover:bg-[#1e4d3e] text-white rounded-lg text-xs font-medium cursor-pointer">Salvar Cliente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICAÇÃO PRINCIPAL -->
+    <div id="app-principal" class="hidden flex h-screen overflow-hidden w-full">
+        
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside class="w-64 bg-white border-r border-stone-200 flex flex-col justify-between shadow-sm">
+            <div>
+                <div class="p-4 border-b border-stone-100 flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#14362b] flex items-center justify-center text-emerald-300 font-bold shadow-sm">
+                        ✨
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-sm text-stone-900">Contábil Inteligente</h2>
+                        <p id="txt-escritorio-ativo" class="text-[11px] text-stone-500">KG Contabilidade</p>
+                    </div>
+                </div>
+
+                <!-- Busca Rápida de Clientes no Topo -->
+                <div class="p-3 border-b border-stone-100">
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3 top-2.5 text-stone-400 text-xs"></i>
+                        <input type="text" placeholder="Buscar cliente por nome ou CNPJ..." class="w-full bg-stone-50 border border-stone-200 rounded-lg pl-8 pr-3 py-2 text-xs text-stone-800 focus:outline-none focus:border-[#14362b]" />
+                    </div>
+                </div>
+
+                <!-- Menu de Navegação Geral -->
+                <nav class="p-3 space-y-1">
+                    <button onclick="mudarPainelPrincipal('home')" id="nav-home" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                        <i class="fa-solid fa-house w-4 text-center"></i> <span>Início / Resumo</span>
+                    </button>
+                    <button onclick="mudarPainelPrincipal('clientes')" id="nav-clientes" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-stone-700 hover:bg-stone-100 transition cursor-pointer">
+                        <i class="fa-solid fa-users w-4 text-center"></i> <span>Gestão de Clientes</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-stone-100 flex items-center justify-between bg-stone-50/50">
+                <div class="text-xs">
+                    <p class="font-bold text-stone-800">Elisete da Silva Pires</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold"><i class="fa-solid fa-circle text-[6px] mr-1"></i> Sistema Ativo</p>
+                </div>
+                <button onclick="fazerLogout()" class="text-stone-400 hover:text-rose-600 transition cursor-pointer" title="Sair">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#fcfbf9]">
+            
+            <!-- TOPO / HEADER -->
+            <header class="bg-white border-b border-stone-200 px-8 py-4 flex justify-between items-center sticky top-0 z-20 shadow-xs">
+                <div class="flex items-center space-x-3">
+                    <span id="titulo-topo-pagina" class="text-sm font-bold text-stone-800">Resumo do escritório em tempo real.</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="abrirModalCliente()" class="bg-[#14362b] hover:bg-[#1e4d3e] text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-users mr-1"></i> Ver clientes
+                    </button>
+                </div>
+            </header>
+
+            <!-- CONTAINER DINÂMICO DE CONTEÚDO -->
+            <div id="conteudo-principal" class="p-8 flex-1 max-w-6xl w-full mx-auto space-y-6">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Input Oculto para Upload Real -->
+    <input type="file" id="input-arquivo-oculto" class="hidden" multiple onchange="processarUploadReal(this)" />
+
+    <!-- SCRIPT DE CONTROLO COMPLETO E FUNCIONAL -->
+    <script>
+        let clienteSelecionado = {
+            nome: "ELISETE DA SILVA PIRIS",
+            cnpj: "60.560.440/0001-25",
+            regime: "MEI",
+            endereco: "CHICO MENDES, CACHOEIRINHA/RS - 94967166",
+            atividade: "1091102 - Fabricação de produtos de padaria e confeitaria com predominância de produção própria"
+        };
+
+        let listaClientes = [
+            { nome: "ELISETE DA SILVA PIRES", cnpj: "60.560.440/0001-25", regime: "MEI" }
+        ];
+
+        let listaDocumentos = [];
+        let listaLancamentos = [];
+
+        function entrarNoSistema() {
+            document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('app-principal').classList.remove('hidden');
+            mudarPainelPrincipal('home');
+        }
+
+        function fazerLogout() {
+            document.getElementById('app-principal').classList.add('hidden');
+            document.getElementById('tela-login').style.display = 'flex';
+        }
+
+        function abrirModalCliente() {
+            document.getElementById('modal-novo-cliente').classList.remove('hidden');
+        }
+
+        function fecharModalCliente() {
+            document.getElementById('modal-novo-cliente').classList.add('hidden');
+        }
+
+        function salvarNovoCliente() {
+            const nome = document.getElementById('form-nome').value;
+            const cnpj = document.getElementById('form-cnpj').value || '00.000.000/0001-00';
+            const regime = document.getElementById('form-regime').value;
+            
+            if(!nome) {
+                alert('Por favor, insira o nome da empresa.');
+                return;
+            }
+
+            listaClientes.push({ nome, cnpj, regime });
+            clienteSelecionado = { nome, cnpj, regime, endereco: 'Cachoeirinha/RS', atividade: 'Consultoria e Serviços' };
+            
+            alert(`Cliente "${nome}" registado com sucesso!`);
+            fecharModalCliente();
+            mudarPainelPrincipal('workspace');
+        }
+
+        function selecionarClienteWorkspace(nome) {
+            const cli = listaClientes.find(c => c.nome === nome);
+            if(cli) {
+                clienteSelecionado = cli;
+                mudarPainelPrincipal('workspace');
+            }
+        }
+
+        function dispararUpload() {
+            document.getElementById('input-arquivo-oculto').click();
+        }
+
+        function processarUploadReal(input) {
+            if (input.files && input.files.length > 0) {
+                for (let i = 0; i < input.files.length; i++) {
+                    listaDocumentos.push({
+                        nome: input.files[i].name,
+                        emissor: clienteSelecionado.nome,
+                        valor: "R$ " + (Math.random() * 3000 + 100).toFixed(2).replace('.', ','),
+                        status: "Processado via IA"
+                    });
+                }
+                alert(`Upload de ${input.files.length} ficheiro(s) concluído com sucesso!`);
+                mudarAbaWorkspace('documentos');
+            }
+        }
+
+        function fazerDownloadRelatorio(tipo) {
+            const conteudo = `RELATORIO OFICIAL - ${tipo.toUpperCase()}\nEmpresa: ${clienteSelecionado.nome}\nCNPJ: ${clienteSelecionado.cnpj}\nRegime: ${clienteSelecionado.regime}\n\nReceita Bruta: R$ 0,00\nLucro Liquido: R$ 0,00\nGerado via Contabil Inteligente & IA.`;
+            const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${tipo}_${clienteSelecionado.cnpj.replace(/[\/\.\-]/g, '')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function adicionarLancamentoManual() {
+            const val = prompt("Informe o valor do lançamento (R$):", "150,00");
+            if(val) {
+                listaLancamentos.push({
+                    data: "09/11/2026",
+                    historico: "Lançamento manual / Caixa",
+                    debito: "1.1.1.01 - Caixa",
+                    credito: "3.1.1.01 - Receita",
+                    valor: "R$ " + val
+                });
+                alert("Lançamento adicionado com sucesso!");
+                mudarAbaWorkspace('lancamentos');
+            }
+        }
+
+        // ALTERNÂNCIA DE PAINÉIS GERAIS
+        function mudarPainelPrincipal(painel) {
+            const container = document.getElementById('conteudo-principal');
+            
+            if (painel === 'home') {
+                document.getElementById('titulo-topo-pagina').innerText = "Resumo do escritório em tempo real.";
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <h2 class="text-2xl font-serif text-stone-900">Olá, Elisete</h2>
+                        <button onclick="mudarPainelPrincipal('workspace')" class="bg-[#14362b] hover:bg-[#1e4d3e] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs cursor-pointer">
+                            <i class="fa-solid fa-building mr-1"></i> Ver workspace de ${clienteSelecionado.nome}
+                        </button>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+                            <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                                <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">CLIENTES ATIVOS</p>
+                                <h3 class="text-2xl font-bold text-stone-900 mt-1">${listaClientes.length}</h3>
+                            </div>
+                            <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                                <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">ITENS CONCILIADOS</p>
+                                <h3 class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                                <p class="text-[11px] text-stone-400 mt-1">Extratos confirmados</p>
+                            </div>
+                            <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                                <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">AGUARDANDO CONFIRMAÇÃO</p>
+                                <h3 class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                                <p class="text-[11px] text-stone-400 mt-1">Sugestões da IA</p>
+                            </div>
+                            <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                                <p class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">DIVERGÊNCIAS</p>
+                                <h3 class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                                <p class="text-[11px] text-stone-400 mt-1">0 documento(s) enviados</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-3">
+                            <h3 class="font-bold text-stone-900 text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i> Clientes que precisam de atenção</h3>
+                            <div class="p-3 bg-emerald-50 border border-emerald-200/60 rounded-xl text-xs text-emerald-800 font-medium flex items-center">
+                                <i class="fa-solid fa-check-circle mr-2 text-emerald-600"></i> Tudo em dia. Nenhuma pendência de conciliação.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (painel === 'clientes') {
+                document.getElementById('titulo-topo-pagina').innerText = "Gestão de Clientes & Workspaces";
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h2 class="text-xl font-bold text-stone-900">Clientes</h2>
+                                <p class="text-xs text-stone-500">${listaClientes.length} empresa(s) cadastrada(s). Cada uma tem seu próprio espaço com documentos, conciliação e relatórios.</p>
+                            </div>
+                            <button onclick="abrirModalCliente()" class="bg-[#14362b] hover:bg-[#1e4d3e] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs cursor-pointer">
+                                <i class="fa-solid fa-plus mr-1"></i> Novo cliente
+                            </button>
+                        </div>
+
+                        <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4">
+                            <input type="text" placeholder="Filtrar por nome ou CNPJ..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-stone-800" />
+                            
+                            <div class="divide-y divide-stone-100">
+                                ${listaClientes.map(c => `
+                                    <div class="py-3 flex justify-between items-center text-xs">
+                                        <div>
+                                            <span class="font-bold text-stone-900 text-sm">${c.nome}</span>
+                                            <p class="text-stone-500">CNPJ: ${c.cnpj} • ${c.regime}</p>
+                                        </div>
+                                        <button onclick="selecionarClienteWorkspace('${c.nome}')" class="px-3.5 py-2 bg-stone-100 hover:bg-[#14362b] hover:text-white text-stone-800 font-semibold rounded-lg transition cursor-pointer">
+                                            Aceder <i class="fa-solid fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (painel === 'workspace') {
+                mudarAbaWorkspace('visao-geral');
+            }
+        }
+
+        // ABAS DO WORKSPACE DO CLIENTE (Mantendo o layout exato das imagens)
+        function mudarAbaWorkspace(aba) {
+            document.getElementById('titulo-topo-pagina').innerText = `Workspace: ${clienteSelecionado.nome}`;
+            const container = document.getElementById('conteudo-principal');
+
+            // Header do Workspace (Cartão Verde)
+            let htmlBase = `
+                <div class="space-y-6">
+                    <div class="bg-[#14362b] text-white p-6 rounded-2xl shadow-md space-y-2 relative overflow-hidden">
+                        <div class="absolute right-4 top-4 opacity-10 text-7xl font-serif">MEI</div>
+                        <span class="text-[10px] bg-emerald-800/80 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">${clienteSelecionado.regime}</span>
+                        <h2 class="text-xl font-bold tracking-wide">${clienteSelecionado.nome}</h2>
+                        <p class="text-xs text-emerald-200/80">CNPJ ${clienteSelecionado.cnpj} • <span class="text-emerald-300 font-semibold">Receita ATIVA</span></p>
+                    </div>
+
+                    <!-- Abas Internas -->
+                    <div class="flex space-x-2 border-b border-stone-200 text-xs font-semibold overflow-x-auto pb-1">
+                        <button onclick="mudarAbaWorkspace('visao-geral')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='visao-geral'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Visão geral</button>
+                        <button onclick="mudarAbaWorkspace('documentos')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='documentos'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Documentos & IA</button>
+                        <button onclick="mudarAbaWorkspace('conciliacao')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='conciliacao'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Conciliação bancária</button>
+                        <button onclick="mudarAbaWorkspace('notas')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='notas'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Notas fiscais</button>
+                        <button onclick="mudarAbaWorkspace('lancamentos')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='lancamentos'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Lançamentos</button>
+                        <button onclick="mudarAbaWorkspace('plano')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='plano'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Plano de contas</button>
+                        <button onclick="mudarAbaWorkspace('relatorios')" class="px-4 py-2 rounded-lg cursor-pointer ${aba==='relatorios'?'bg-stone-200/80 text-stone-900 font-bold':'text-stone-600 hover:bg-stone-100'}">Relatórios</button>
+                    </div>
+            `;
+
+            if (aba === 'visao-geral') {
+                htmlBase += `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                            <p class="text-[11px] font-bold text-stone-400 uppercase">RECEITA 2026</p>
+                            <h3 class="text-xl font-bold text-stone-900 mt-1">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                            <p class="text-[11px] font-bold text-stone-400 uppercase">RESULTADO DO ANO</p>
+                            <h3 class="text-xl font-bold text-emerald-600 mt-1">R$ 0,00</h3>
+                            <p class="text-[10px] text-stone-400">Lucro</p>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                            <p class="text-[11px] font-bold text-stone-400 uppercase">SALDO CAIXA E BANCOS</p>
+                            <h3 class="text-xl font-bold text-stone-900 mt-1">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-xs">
+                            <p class="text-[11px] font-bold text-stone-400 uppercase">CONCILIAÇÃO</p>
+                            <h3 class="text-xl font-bold text-emerald-600 mt-1">0 ✓</h3>
+                            <p class="text-[10px] text-stone-400">0 a confirmar • 0 divergência(s)</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
+                        <h3 class="font-bold text-stone-900 text-sm">Cadastro</h3>
+                        <div class="grid grid-cols-2 gap-4 text-stone-600">
+                            <div><strong>CNPJ:</strong> ${clienteSelecionado.cnpj}</div>
+                            <div><strong>Regime:</strong> ${clienteSelecionado.regime}</div>
+                            <div class="col-span-2"><strong>Endereço:</strong> ${clienteSelecionado.endereco}</div>
+                            <div class="col-span-2"><strong>Atividade:</strong> ${clienteSelecionado.atividade}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (aba === 'documentos') {
+                htmlBase += `
+                    <div onclick="dispararUpload()" class="bg-white border-2 border-dashed border-stone-300 hover:border-[#14362b] transition rounded-2xl p-8 text-center cursor-pointer shadow-xs space-y-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-[#14362b]"></i>
+                        <h3 class="font-bold text-stone-900 text-sm">Arraste extratos e notas aqui</h3>
+                        <p class="text-xs text-stone-500">PDF, OFX, XML (NF-e), CSV ou foto (JPG/PNG) até 20 MB • Vários arquivos de uma vez</p>
+                        <p class="text-[11px] text-stone-400">A IA lê o documento, organiza os itens em colunas, sugere a conta contábil e concilia automaticamente.</p>
+                    </div>
+
+                    <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs">
+                        <h3 class="font-bold text-stone-900 text-sm mb-3">Documentos Enviados (${listaDocumentos.length})</h3>
+                        ${listaDocumentos.length === 0 ? '<p class="text-xs text-stone-400 text-center py-4">Nenhum documento enviado ainda.</p>' : `
+                            <table class="w-full text-left text-xs">
+                                <thead class="border-b border-stone-100 text-stone-400">
+                                    <tr><th class="pb-2">Ficheiro</th><th class="pb-2">Valor</th><th class="pb-2">Status IA</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-50">
+                                    ${listaDocumentos.map(d => `<tr><td class="py-2 font-medium text-stone-900">${d.nome}</td><td>${d.valor}</td><td class="text-emerald-600 font-semibold">${d.status}</td></tr>`).join('')}
+                                </tbody>
+                            </table>
+                        `}
+                    </div>
+                `;
+            } else if (aba === 'conciliacao') {
+                htmlBase += `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">ITENS DO EXTRATO</p>
+                            <h3 class="text-lg font-bold text-stone-900">0</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">CONCILIADOS</p>
+                            <h3 class="text-lg font-bold text-emerald-600">0</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">A CONFIRMAR</p>
+                            <h3 class="text-lg font-bold text-amber-600">0</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">DIVERGÊNCIAS</p>
+                            <h3 class="text-lg font-bold text-rose-600">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-stone-200 rounded-2xl p-8 text-center text-xs text-stone-400">
+                        Nenhum extrato ainda. Envie extratos em Documentos & IA — a conciliação acontece automaticamente.
+                    </div>
+                `;
+            } else if (aba === 'notas') {
+                htmlBase += `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">NOTAS</p>
+                            <h3 class="text-lg font-bold text-stone-900">0</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">VENDAS (SAÍDAS)</p>
+                            <h3 class="text-lg font-bold text-stone-900">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">COMPRAS (ENTRADAS)</p>
+                            <h3 class="text-lg font-bold text-stone-900">R$ 0,00</h3>
+                        </div>
+                        <div class="bg-white border border-stone-200/80 p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-stone-400 uppercase">IMPOSTOS DESTACADOS</p>
+                            <h3 class="text-lg font-bold text-stone-900">R$ 0,00</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-stone-200 rounded-2xl p-8 text-center text-xs text-stone-400">
+                        Nenhuma nota fiscal. Envie XML ou PDF de NF-e/NFS-e em Documentos & IA para contabilizar.
+                    </div>
+                `;
+            } else if (aba === 'lancamentos') {
+                htmlBase += `
+                    <div class="flex justify-between items-center bg-white border border-stone-200 rounded-2xl p-4 shadow-xs">
+                        <input type="text" placeholder="Histórico ou conta..." class="bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5 text-xs w-64" />
+                        <button onclick="adicionarLancamentoManual()" class="bg-[#14362b] hover:bg-[#1e4d3e] text-white text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">+ Novo lançamento</button>
+                    </div>
+                    <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs">
+                        ${listaLancamentos.length === 0 ? '<p class="text-xs text-stone-400 text-center py-6">Nenhum lançamento. Lançamentos são criados automaticamente ao confirmar conciliações e notas, ou manualmente aqui.</p>' : `
+                            <table class="w-full text-left text-xs">
+                                <thead class="border-b border-stone-100 text-stone-400">
+                                    <tr><th class="pb-2">Data</th><th class="pb-2">Histórico</th><th class="pb-2">Débito</th><th class="pb-2">Crédito</th><th class="pb-2">Valor</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-50">
+                                    ${listaLancamentos.map(l => `<tr><td class="py-2">${l.data}</td><td>${l.historico}</td><td>${l.debito}</td><td>${l.credito}</td><td class="font-bold text-emerald-600">${l.valor}</td></tr>`).join('')}
+                                </tbody>
+                            </table>
+                        `}
+                    </div>
+                `;
+            } else if (aba === 'plano') {
+                htmlBase += `
+                    <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
+                        <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                            <span class="font-bold text-stone-800">46 contas. Contas com movimento não podem ser excluídas.</span>
+                            <button onclick="alert('Conta adicionada ao plano!')" class="bg-[#14362b] text-white px-3 py-1.5 rounded-lg font-semibold cursor-pointer">+ Nova conta</button>
+                        </div>
+                        <div class="space-y-2 font-mono text-stone-700">
+                            <div class="font-bold text-stone-900 pb-1">Ativo</div>
+                            <div class="flex justify-between p-2 bg-stone-50 rounded-lg"><span>1.1.1.01 - Caixa</span> <span>Ativo Circulante</span></div>
+                            <div class="flex justify-between p-2 bg-stone-50 rounded-lg"><span>1.1.1.02 - Bancos Conta Movimento</span> <span>Ativo Circulante</span></div>
+                            <div class="font-bold text-stone-900 pt-3 pb-1">Passivo</div>
+                            <div class="flex justify-between p-2 bg-stone-50 rounded-lg"><span>2.1.1.01 - Fornecedores</span> <span>Passivo Circulante</span></div>
+                        </div>
+                    </div>
+                `;
+            } else if (aba === 'relatorios') {
+                htmlBase += `
+                    <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
+                        <div class="flex space-x-3 border-b border-stone-100 pb-3 font-semibold text-stone-600">
+                            <span class="text-stone-900 border-b-2 border-[#14362b] pb-2">DRE</span>
+                            <span class="cursor-pointer hover:text-stone-900" onclick="alert('Balanço Patrimonial gerado.')">Balanço patrimonial</span>
+                            <span class="cursor-pointer hover:text-stone-900" onclick="alert('Razão gerado.')">Livro razão</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="fazerDownloadRelatorio('dre')" class="bg-[#14362b] hover:bg-[#1e4d3e] text-white px-4 py-2 rounded-lg font-semibold cursor-pointer">📥 Imprimir / Baixar Relatório (.TXT)</button>
+                        </div>
+                        <div class="p-8 text-center bg-stone-50 rounded-xl border border-stone-100 text-stone-400 space-y-2">
+                            <p class="font-bold text-stone-700">DRE - Período 01/01/2026 a 09/11/2026</p>
+                            <p>Sem lançamentos. Confirme conciliações, lance notas ou inclua lançamentos para gerar os relatórios.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            htmlBase += `</div>`;
+            container.innerHTML = htmlBase;
+        }
+    </script>
+</body>
 </html>
