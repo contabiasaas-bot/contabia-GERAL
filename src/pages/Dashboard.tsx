@@ -1,147 +1,138 @@
-import React, { useState } from 'react'
-import { uploadDocument, getDocumentDownloadUrl, deleteDocument } from '../lib/fileManager'
+import React, { useState } from 'react';
+import { Upload, FileText, CheckCircle2, ShieldAlert, Building2, TrendingUp, Users, ArrowUpRight } from 'lucide-react';
 
 export function Dashboard() {
-  const [uploading, setUploading] = useState(false)
-  const [documents, setDocuments] = useState<any[]>([])
-
-  // Exemplo de manipulador para Upload
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true)
-      if (!event.target.files || event.target.files.length === 0) return
-      const file = event.target.files[0]
-      
-      // IDs de exemplo (na aplicação real vêm do contexto de autenticação/cliente selecionado)
-      const mockClientId = "00000000-0000-0000-0000-000000000000"
-      const mockUserId = "00000000-0000-0000-0000-000000000000"
-
-      const newDoc = await uploadDocument(file, mockClientId, mockUserId)
-      setDocuments((prev) => [...prev, newDoc])
-      alert('Arquivo enviado com sucesso!')
-    } catch (error: any) {
-      alert('Erro ao enviar arquivo: ' + error.message)
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  // Exemplo de manipulador para Download
-  const handleDownload = async (filePath: string) => {
-    try {
-      const url = await getDocumentDownloadUrl(filePath)
-      window.open(url, '_blank')
-    } catch (error: any) {
-      alert('Erro ao baixar arquivo: ' + error.message)
-    }
-  }
-
-  // Exemplo de manipulador para Exclusão
-  const handleDelete = async (docId: string, filePath: string) => {
-    if (!confirm('Deseja realmente excluir este arquivo?')) return
-    try {
-      await deleteDocument(docId, filePath)
-      setDocuments((prev) => prev.filter((doc) => doc.id !== docId))
-      alert('Arquivo excluído com sucesso!')
-    } catch (error: any) {
-      alert('Erro ao excluir arquivo: ' + error.message)
-    }
-  }
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-8 font-sans">
-      <header className="flex justify-between items-center pb-6 mb-8 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-400">Portal Contábil Multi-Tenant</h1>
-          <p className="text-sm text-slate-400">Gestão de Documentos, Conciliação e IA Auditora</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="bg-blue-900/50 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-700">
-            Escritório Ativo
-          </span>
+    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans">
+      {/* Top Navbar */}
+      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="bg-blue-600 p-2 rounded-lg text-white">
+              <Building2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight">Portal Contábil Multi-Tenant</h1>
+              <p className="text-xs text-slate-400">Escritório Ativo — Gestão Inteligente</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+              Sistema Operacional
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* Painel Central de Upload e Ações */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-          <h2 className="text-lg font-semibold mb-4 text-slate-200">Upload de Arquivos</h2>
-          <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-600 rounded-lg p-6 cursor-pointer hover:border-blue-500 transition-colors">
-            <span className="text-sm text-slate-400 mb-2">
-              {uploading ? 'Enviando...' : 'Clique para selecionar Nota ou Extrato'}
-            </span>
-            <input 
-              type="file" 
-              onChange={handleFileUpload} 
-              disabled={uploading} 
-              className="hidden" 
-            />
-          </label>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Conciliação Bancária</p>
+                <h3 className="text-2xl font-bold text-emerald-400 mt-1">100%</h3>
+              </div>
+              <div className="p-3 bg-emerald-500/10 rounded-lg text-emerald-400">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 mt-4 flex items-center">
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400 mr-1" />
+              Lançamentos validados sem divergência
+            </p>
+          </div>
+
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Auditoria IA</p>
+                <h3 className="text-2xl font-bold text-blue-400 mt-1">Seguro</h3>
+              </div>
+              <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 mt-4">Nenhum risco contábil detetado no último lote.</p>
+          </div>
+
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Documentos Ativos</p>
+                <h3 className="text-2xl font-bold text-purple-400 mt-1">0 Lotes</h3>
+              </div>
+              <div className="p-3 bg-purple-500/10 rounded-lg text-purple-400">
+                <FileText className="w-6 h-6" />
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 mt-4">Pronto para novos uploads e conciliações.</p>
+          </div>
         </div>
 
-        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-          <h2 className="text-lg font-semibold mb-2 text-slate-200">Resumo da Conciliação</h2>
-          <p className="text-3xl font-bold text-emerald-400">100%</p>
-          <p className="text-xs text-slate-400 mt-2">Lançamentos validados sem divergência</p>
+        {/* Upload Section */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+          <h2 className="text-lg font-semibold text-slate-100 mb-4 flex items-center">
+            <Upload className="w-5 h-5 mr-2 text-blue-400" />
+            Upload de Arquivos Contábeis
+          </h2>
+          
+          <div className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-blue-500 transition-colors bg-slate-900/50">
+            <Upload className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+            <p className="text-sm font-medium text-slate-200 mb-1">
+              Arraste ficheiros de notas ou extratos aqui, ou clique abaixo
+            </p>
+            <p className="text-xs text-slate-400 mb-4">Suporta formato OFX, PDF, XML e CSV</p>
+            
+            <label className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg cursor-pointer transition-colors shadow-lg">
+              <span>Selecionar Arquivo</span>
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} 
+              />
+            </label>
+            {selectedFile && (
+              <p className="text-xs text-emerald-400 mt-3 font-medium">
+                Arquivo selecionado: {selectedFile.name}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-          <h2 className="text-lg font-semibold mb-2 text-slate-200">Auditoria IA</h2>
-          <p className="text-sm text-slate-300">Nenhum risco contábil detectado no último lote.</p>
-        </div>
-      </div>
-
-      {/* Tabela de Arquivos Processados */}
-      <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div className="p-4 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-slate-200">Documentos da Empresa</h2>
-        </div>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-slate-700 bg-slate-800/50 text-slate-400 text-sm">
-              <th className="p-4">Nome do Arquivo</th>
-              <th className="p-4">Tipo</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700 text-sm">
-            {documents.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-slate-500">
-                  Nenhum documento enviado ainda.
-                </td>
-              </tr>
-            ) : (
-              documents.map((doc) => (
-                <tr key={doc.id} className="hover:bg-slate-700/50">
-                  <td className="p-4 font-medium">{doc.file_name}</td>
-                  <td className="p-4 text-slate-400">{doc.file_type}</td>
-                  <td className="p-4">
-                    <span className="bg-emerald-900/40 text-emerald-400 text-xs px-2 py-1 rounded">
-                      {doc.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right space-x-2">
-                    <button 
-                      onClick={() => handleDownload(doc.file_path)}
-                      className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded"
-                    >
-                      Download
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(doc.id, doc.file_path)}
-                      className="bg-rose-600 hover:bg-rose-500 text-white text-xs px-3 py-1 rounded"
-                    >
-                      Excluir
-                    </button>
+        {/* Documents Table Section */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+          <div className="p-6 border-b border-slate-700">
+            <h2 className="text-lg font-semibold text-slate-100">Documentos da Empresa</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Histórico de lotes enviados e status de auditoria</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                  <th className="py-3 px-6 font-semibold">Nome do Arquivo</th>
+                  <th className="py-3 px-6 font-semibold">Tipo</th>
+                  <th className="py-3 px-6 font-semibold">Status</th>
+                  <th className="py-3 px-6 font-semibold text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700 text-sm">
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-slate-400">
+                    Nenhum documento enviado ainda.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
     </div>
-  )
+  );
 }
