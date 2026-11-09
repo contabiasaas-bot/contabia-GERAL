@@ -21,18 +21,58 @@ export function Dashboard() {
     { cnpj: '60.560.440/0001-25', name: '60.560.440 ELISETE DA SILVA PIRES', regime: 'MEI', status: 'Ativa' }
   ]);
 
-  const [accountsList] = useState({
+  // Plano de Contas Completo extraído das telas de referência
+  const [accounts] = useState({
     ativo: [
-      { code: '1.1.01', name: 'Caixa' },
-      { code: '1.1.02', name: 'Bancos Conta Movimento' },
-      { code: '1.1.03', name: 'Aplicações Financeiras' },
-      { code: '1.1.04', name: 'Clientes a Receber' }
+      { code: '1.1.01', name: 'Caixa', tag: 'CAIXA' },
+      { code: '1.1.02', name: 'Bancos Conta Movimento', tag: 'CAIXA' },
+      { code: '1.1.03', name: 'Aplicações Financeiras', tag: 'CAIXA' },
+      { code: '1.1.04', name: 'Clientes a Receber' },
+      { code: '1.1.05', name: 'Estoques' },
+      { code: '1.1.06', name: 'Impostos a Recuperar' },
+      { code: '1.1.07', name: 'Adiantamentos' },
+      { code: '1.2.01', name: 'Imobilizado - Máquinas e Equipamentos' },
+      { code: '1.2.02', name: 'Imobilizado - Veículos' },
+      { code: '1.2.03', name: 'Imobilizado - Móveis e Utensílios' },
+      { code: '1.2.04', name: 'Imobilizado - Computadores' }
     ],
     passivo: [
       { code: '2.1.01', name: 'Fornecedores' },
       { code: '2.1.02', name: 'Salários a Pagar' },
-      { code: '2.1.03', name: 'Encargos Sociais (INSS/FGTS)' },
-      { code: '2.1.04', name: 'Impostos a Recolher' }
+      { code: '2.1.03', name: 'Encargos Sociais a Pagar (INSS/FGTS)' },
+      { code: '2.1.04', name: 'Impostos a Recolher' },
+      { code: '2.1.05', name: 'Empréstimos e Financiamentos CP' },
+      { code: '2.1.06', name: 'Contas a Pagar Diversas' },
+      { code: '2.2.01', name: 'Empréstimos e Financiamentos LP' }
+    ],
+    patrimonio: [
+      { code: '3.1.01', name: 'Capital Social' },
+      { code: '3.1.02', name: 'Lucros ou Prejuízos Acumulados' },
+      { code: '3.1.03', name: 'Distribuição de Lucros' }
+    ],
+    receitas: [
+      { code: '4.1.01', name: 'Receita de Vendas de Mercadorias' },
+      { code: '4.1.02', name: 'Receita de Prestação de Serviços' },
+      { code: '4.1.03', name: 'Receitas Financeiras' },
+      { code: '4.1.04', name: 'Outras Receitas' },
+      { code: '4.2.01', name: '(-) Impostos sobre Vendas (DAS/ICMS/ISS/PIS/COFINS)' },
+      { code: '4.2.02', name: '(-) Devoluções e Descontos' }
+    ],
+    custos: [
+      { code: '5.1.01', name: 'Custo das Mercadorias Vendidas (CMV)' },
+      { code: '5.1.02', name: 'Custo dos Serviços Prestados (CSP)' }
+    ],
+    despesas: [
+      { code: '6.1.01', name: 'Salários e Ordenados' },
+      { code: '6.1.02', name: 'Encargos Sociais (INSS/FGTS)' },
+      { code: '6.1.03', name: 'Pró-labore' },
+      { code: '6.1.04', name: 'Aluguel' },
+      { code: '6.1.05', name: 'Energia, Água e Telefone' },
+      { code: '6.1.06', name: 'Internet e Software' },
+      { code: '6.1.07', name: 'Honorários Contábeis' },
+      { code: '6.1.08', name: 'Material de Escritório e Consumo' },
+      { code: '6.1.09', name: 'Combustível e Transporte' },
+      { code: '6.1.10', name: 'Marketing e Publicidade' }
     ]
   });
 
@@ -91,7 +131,7 @@ export function Dashboard() {
   return (
     <div className="flex h-screen bg-[#FDFBF7] text-[#1A2E22] font-sans overflow-hidden">
       
-      {/* SIDEBAR CORPORATIVA EXATA */}
+      {/* SIDEBAR CORPORATIVA */}
       <aside className="w-64 bg-[#1A2E22] text-[#FDFBF7] flex flex-col justify-between shrink-0">
         <div>
           <div className="p-4 border-b border-[#2A4836] flex items-center space-x-3">
@@ -197,7 +237,7 @@ export function Dashboard() {
             </div>
           )}
 
-          {/* LISTA DE CLIENTES COM O BOTÃO ABRIR FUNCIONAL */}
+          {/* LISTA DE CLIENTES */}
           {activeTab === 'clients' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
@@ -245,7 +285,7 @@ export function Dashboard() {
             </div>
           )}
 
-          {/* ESPAÇO DO CLIENTE (CNPJ) COM TODAS AS ABAS REQUISITADAS */}
+          {/* ESPAÇO DO CLIENTE (CNPJ) */}
           {activeTab === 'client-workspace' && (
             <div className="space-y-6">
               
@@ -265,7 +305,7 @@ export function Dashboard() {
                 </div>
               </div>
 
-              {/* ABAS INTERNAS DO CLIENTE */}
+              {/* ABAS DO CLIENTE */}
               <div className="flex border-b border-[#E6E2D6] space-x-6 text-xs font-semibold overflow-x-auto">
                 <button onClick={() => setActiveSubTab('visao')} className={`pb-3 border-b-2 transition-all whitespace-nowrap ${activeSubTab === 'visao' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Visão geral</button>
                 <button onClick={() => setActiveSubTab('docs')} className={`pb-3 border-b-2 transition-all whitespace-nowrap ${activeSubTab === 'docs' ? 'border-[#1A2E22] text-[#1A2E22]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>Documentos & IA</button>
@@ -350,18 +390,37 @@ export function Dashboard() {
                 </div>
               )}
 
-              {/* 6. PLANO DE CONTAS */}
+              {/* 6. PLANO DE CONTAS COMPLETO (ATIVO, PASSIVO, PATRIMÔNIO, RECEITAS, CUSTOS, DESPESAS) */}
               {activeSubTab === 'plano' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
                   <div className="flex justify-between items-center border-b border-[#E6E2D6] pb-4">
-                    <p className="text-xs text-slate-500">Estrutura contábil (Ativo, Passivo, Patrimônio Líquido, Receitas, Custos e Despesas).</p>
+                    <p className="text-xs text-slate-500">46 contas. Contas com movimento não podem ser excluídas.</p>
                     <button className="bg-[#1A2E22] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center shadow-md"><Plus className="w-3.5 h-3.5 mr-1" /> Nova conta</button>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Ativo */}
                     <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
                       <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Ativo</h4>
                       <div className="space-y-2 text-xs">
-                        {accountsList.ativo.map((acc, idx) => (
+                        {accounts.ativo.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              {acc.tag && <span className="bg-[#F4F1EA] px-2 py-0.5 rounded text-[10px] font-bold text-slate-600 mr-2">{acc.tag}</span>}
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Passivo */}
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Passivo</h4>
+                      <div className="space-y-2 text-xs">
+                        {accounts.passivo.map((acc, idx) => (
                           <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
                             <span className="font-semibold">{acc.code} · {acc.name}</span>
                             <span className="space-x-2">
@@ -372,10 +431,60 @@ export function Dashboard() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Patrimônio Líquido */}
                     <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
-                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Passivo</h4>
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Patrimônio líquido</h4>
                       <div className="space-y-2 text-xs">
-                        {accountsList.passivo.map((acc, idx) => (
+                        {accounts.patrimonio.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Receitas */}
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Receitas</h4>
+                      <div className="space-y-2 text-xs">
+                        {accounts.receitas.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Custos */}
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Custos</h4>
+                      <div className="space-y-2 text-xs">
+                        {accounts.custos.map((acc, idx) => (
+                          <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
+                            <span className="font-semibold">{acc.code} · {acc.name}</span>
+                            <span className="space-x-2">
+                              <button className="text-slate-500 hover:text-slate-800"><Edit className="w-3.5 h-3.5 inline" /></button>
+                              <button className="text-red-500 hover:text-red-700"><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Despesas */}
+                    <div className="border border-[#E6E2D6] rounded-2xl p-5 bg-[#FDFBF7]">
+                      <h4 className="font-bold text-sm mb-3 text-[#1A2E22]">Despesas</h4>
+                      <div className="space-y-2 text-xs">
+                        {accounts.despesas.map((acc, idx) => (
                           <div key={idx} className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-[#E6E2D6]">
                             <span className="font-semibold">{acc.code} · {acc.name}</span>
                             <span className="space-x-2">
@@ -390,7 +499,7 @@ export function Dashboard() {
                 </div>
               )}
 
-              {/* 7. RELATÓRIOS (DRE, BALANÇO, FLUXO DE CAIXA, BALANCETE, RAZONETE, LIVRO RAZÃO, LIVRO DIÁRIO) */}
+              {/* 7. RELATÓRIOS (DRE, BALANÇO, FLUXO, BALANCETE, RAZONETE, RAZÃO, DIÁRIO) */}
               {activeSubTab === 'relatorios' && (
                 <div className="bg-white border border-[#E6E2D6] rounded-3xl p-6 space-y-6 shadow-sm">
                   <div className="flex border-b border-[#E6E2D6] space-x-3 text-xs font-semibold pb-3 overflow-x-auto">
